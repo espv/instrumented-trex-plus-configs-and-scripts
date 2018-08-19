@@ -1,3 +1,4 @@
 [submodule "TRex"]
 	path = TRex
 	url = git@github.com:espv/TRex.git
+	branch = master
