@@ -1,0 +1,575 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BuildServerSettings">
+    <option name="LOGIN" value="" />
+    <option name="SERVER_URL" value="http://buildserver" />
+    <option name="REMEMBER_ME" value="true" />
+    <option name="USE_IDEA_PROXY_SETTINGS" value="true" />
+    <option name="INSPECTIONS_BUILD_TYPE_IDS" />
+    <option name="DUPLICATES_BUILD_TYPE_IDS" />
+    <option name="COVERAGE_SETTINGS" />
+    <option name="TEST_STATUS_ENABLED" value="true" />
+    <option name="TEST_STATUS_SHOW_SUCCESSFUL" value="false" />
+    <option name="POSTPONE_SUITABLE_CONFIGURATIONS_SEARCH" value="false" />
+    <option name="ARTIFACTS_BUILD_TYPE_IDS" />
+    <option name="PERFORM_COMMIT_IF_SUCCESSFUL" value="true" />
+    <option name="PERFORM_COMMIT_IF_NO_NEW_FAILED_TESTS" value="false" />
+    <option name="REQUEST_CONFIRMATON" value="false" />
+    <option name="PRE_TESTED_COMMIT" value="true" />
+    <option name="FILTER_BY_STATUS" value="false" />
+    <option name="FILTER_MARKED_AS_FIXED" value="false" />
+    <option name="SHOW_CLOSE_PROMPT" value="true" />
+    <option name="TOOL_WINDOW_SELECTED_CONTENT_INDEX" value="0" />
+    <option name="FILTER_BY_CURRENT_PROJECT" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
+    <generated>
+      <config projectName="TRexServer" targetName="ConfigureProdTRex" />
+      <config projectName="TRexServer" targetName="ConfigureDebugTRex" />
+      <config projectName="TRexServer" targetName="TRexServer" />
+    </generated>
+  </component>
+  <component name="CMakeSettings" AUTO_RELOAD="true">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="63f2de58-199a-49be-bc2a-cc1857b95bd4" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.gitignore.swp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/instrumented-trex-plus-configs-and-scripts.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/TRex.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Java-client/rule-r9" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex2-lib/run_debug_configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex2-lib/run_production_configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/TRexServer.cbp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/instrumented_trex_plus_configs_and_scripts.cbp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cmake-build-debug/processing-delay-models.cbp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex" beforeDir="false" afterPath="$PROJECT_DIR$/TRex" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/LICENCE" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/Makefile.am" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/configure.ac" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/m4/ax_cxx_compile_stdcxx.m4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/m4/boost.m4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/Connection.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/Connection.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/ConnectionProxy.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/ConnectionProxy.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/PubPktListener.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/PubPktListener.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/SubscriptionTable.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/SubscriptionTable.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Main.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Makefile.am" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/BufferedPacketUnmarshaller.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/BufferedPacketUnmarshaller.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PacketMarshaller.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PacketMarshaller.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PingPkt.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PingPkt.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/Pkt.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/UnSubPkt.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/UnSubPkt.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Server/SOEPServer.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Server/SOEPServer.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR0.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR0.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR1.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR1.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestResultListener.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestResultListener.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestRule.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestRule.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/CharVector.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/Logging.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/Logging.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/TRexUtils.cpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/TRexUtils.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/connection.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/external.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/packet.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/server.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/test.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/util.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc" afterDir="false" />
+    </list>
+    <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="FUSProjectUsageTrigger">
+    <session id="-1093506361">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.closed" value="2" />
+          <entry key="project.open.time.0" value="2" />
+          <entry key="project.open.time.2" value="2" />
+          <entry key="project.open.time.3" value="1" />
+          <entry key="project.opened" value="5" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.edit">
+        <counts>
+          <entry key="cc" value="160" />
+          <entry key="sh" value="22" />
+          <entry key="txt" value="77" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.edit">
+        <counts>
+          <entry key="Bash" value="22" />
+          <entry key="CMakeLists.txt" value="77" />
+          <entry key="ObjectiveC" value="160" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.extensions.open">
+        <counts>
+          <entry key="TRexServer (disassembly)" value="3" />
+          <entry key="cc" value="4" />
+          <entry key="cpp" value="1" />
+          <entry key="h" value="7" />
+          <entry key="sh" value="1" />
+        </counts>
+      </usages-collector>
+      <usages-collector id="statistics.file.types.open">
+        <counts>
+          <entry key="Bash" value="1" />
+          <entry key="Disassembly" value="3" />
+          <entry key="ObjectiveC" value="12" />
+        </counts>
+      </usages-collector>
+    </session>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="482">
+              <caret line="286" lean-forward="true" selection-start-line="286" selection-end-line="286" />
+              <folding>
+                <element signature="e#7526#7554#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/5/bits/stl_map.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="7335">
+              <caret line="489" selection-start-line="489" selection-end-line="489" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/5/bits/stl_tree.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2280">
+              <caret line="152" selection-start-line="152" selection-end-line="152" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file:///usr/include/c++/5/ext/aligned_buffer.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="930">
+              <caret line="62" selection-start-line="62" selection-end-line="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1035">
+              <caret line="69" column="38" selection-start-line="69" selection-start-column="24" selection-end-line="69" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/CompositeEventGenerator.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="32" column="43" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/CompositeEventGenerator.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="810">
+              <caret line="54" column="17" selection-start-line="54" selection-start-column="17" selection-end-line="54" selection-end-column="17" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2820">
+              <caret line="188" column="20" selection-start-line="188" selection-start-column="20" selection-end-line="188" selection-end-column="20" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Packets/PubPkt.cc">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1290">
+              <caret line="86" selection-start-line="86" selection-end-line="86" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2895">
+              <caret line="193" column="38" selection-start-line="193" selection-start-column="38" selection-end-line="193" selection-end-column="38" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>sequen</find>
+      <find>compute</find>
+      <find>seq</find>
+      <find>CompositeEventGenerator::compute</find>
+      <find>startComputation</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/TRex" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/TRex/TRex-Server/custom_setup.sh" />
+        <option value="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp" />
+        <option value="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc" />
+        <option value="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodePackageJsonFileManager">
+    <packageJsonPaths>
+      <path value="$PROJECT_DIR$/TRex/TRex-HttpProxy/package.json" />
+    </packageJsonPaths>
+  </component>
+  <component name="OCFindUsagesOptions" text="true" ivars="false" properties="true" derivedClasses="false" />
+  <component name="ProjectFrameBounds" extendedState="6">
+    <option name="x" value="-1" />
+    <option name="y" value="175" />
+    <option name="width" value="1922" />
+    <option name="height" value="1083" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectView">
+    <navigator proportions="" version="1">
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <expand>
+            <path>
+              <item name="TRexServer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="instrumented-trex-plus-configs-and-scripts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TRexServer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="instrumented-trex-plus-configs-and-scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TRexServer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="instrumented-trex-plus-configs-and-scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex-Server" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TRexServer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="instrumented-trex-plus-configs-and-scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex-Server" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="TRexServer" type="b2602c69:ProjectViewProjectNode" />
+              <item name="instrumented-trex-plus-configs-and-scripts" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex" type="462c0819:PsiDirectoryNode" />
+              <item name="TRex-Server" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="Connection" type="462c0819:PsiDirectoryNode" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/TRex/TRex-Server/src/TRexServer" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.TRexServer">
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" EXPLICIT_BUILD_TARGET_NAME="all">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConfigureDebugTRex" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TRexServer" TARGET_NAME="ConfigureDebugTRex" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ConfigureProdTRex" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TRexServer" TARGET_NAME="ConfigureProdTRex" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TRexServer" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="TRexServer" TARGET_NAME="TRexServer" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/TRex/TRex-Server/src/TRexServer">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.Build All" />
+      <item itemvalue="Application.ConfigureDebugTRex" />
+      <item itemvalue="Application.ConfigureProdTRex" />
+      <item itemvalue="Application.TRexServer" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="63f2de58-199a-49be-bc2a-cc1857b95bd4" name="Default Changelist" comment="" />
+      <created>1534854657029</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1534854657029</updated>
+      <workItem from="1534854658233" duration="7372000" />
+      <workItem from="1535361733128" duration="13000" />
+      <workItem from="1535361759610" duration="446000" />
+      <workItem from="1539525486675" duration="1139000" />
+      <workItem from="1539673453427" duration="950000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="9920000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-1" y="175" width="1922" height="1083" extended-state="6" />
+    <layout>
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19037433" />
+      <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Message" order="0" />
+      <window_info anchor="bottom" id="Find" order="1" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3287234" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.399361" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="TeamCity" order="8" />
+      <window_info anchor="bottom" id="Messages" order="9" weight="0.37021276" />
+      <window_info anchor="bottom" id="Terminal" order="10" />
+      <window_info anchor="bottom" id="Event Log" order="11" side_tool="true" />
+      <window_info active="true" anchor="bottom" id="Version Control" order="12" visible="true" weight="0.32978722" />
+      <window_info anchor="bottom" id="CMake" order="13" weight="0.3298722" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
+      <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="LuaJ" order="3" />
+      <window_info anchor="right" id="Database" order="4" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc</url>
+          <line>81</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc</url>
+          <line>64</line>
+          <option name="timeStamp" value="10" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc</url>
+          <line>56</line>
+          <option name="timeStamp" value="11" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc</url>
+          <line>75</line>
+          <option name="timeStamp" value="12" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc</url>
+          <line>210</line>
+          <option name="timeStamp" value="13" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" selection-start-line="31" selection-end-line="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex-Server/custom_setup.sh">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="28" selection-start-line="1" selection-start-column="28" selection-end-line="1" selection-end-column="28" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/IndexingTableCommon.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="510">
+          <caret line="43" column="31" selection-start-line="43" selection-start-column="31" selection-end-line="43" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="482">
+          <caret line="286" lean-forward="true" selection-start-line="286" selection-end-line="286" />
+          <folding>
+            <element signature="e#7526#7554#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/stl_map.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7335">
+          <caret line="489" selection-start-line="489" selection-end-line="489" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/bits/stl_tree.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2280">
+          <caret line="152" selection-start-line="152" selection-end-line="152" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/5/ext/aligned_buffer.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="930">
+          <caret line="62" selection-start-line="62" selection-end-line="62" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1035">
+          <caret line="69" column="38" selection-start-line="69" selection-start-column="24" selection-end-line="69" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/CompositeEventGenerator.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" column="43" selection-start-line="32" selection-start-column="43" selection-end-line="32" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/CompositeEventGenerator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="810">
+          <caret line="54" column="17" selection-start-line="54" selection-start-column="17" selection-end-line="54" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2820">
+          <caret line="188" column="20" selection-start-line="188" selection-start-column="20" selection-end-line="188" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Packets/PubPkt.cc">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1290">
+          <caret line="86" selection-start-line="86" selection-end-line="86" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2895">
+          <caret line="193" column="38" selection-start-line="193" selection-start-column="38" selection-end-line="193" selection-end-column="38" />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
