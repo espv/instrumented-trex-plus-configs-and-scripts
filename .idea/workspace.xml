@@ -37,14 +37,12 @@
   <component name="ChangeListManager">
     <list default="true" id="63f2de58-199a-49be-bc2a-cc1857b95bd4" name="Default Changelist" comment="">
       <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore.swp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/codeStyles/Project.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/instrumented-trex-plus-configs-and-scripts.iml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/.idea/TRex.iml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/.idea/codeStyles/Project.xml" afterDir="false" />
@@ -53,60 +51,59 @@
       <change afterPath="$PROJECT_DIR$/TRex/.idea/vcs.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/.idea/workspace.xml" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/TRex-Java-client/rule-r9" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/custom_setup.sh" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/run_debug_configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/run_production_configure" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/Connection.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/Connection.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/ConnectionProxy.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/ConnectionProxy.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/PubPktListener.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/PubPktListener.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/RequestHandler.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/RequestHandler.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/SubscriptionTable.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Connection/SubscriptionTable.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Main.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Makefile.am" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/BufferedPacketUnmarshaller.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/BufferedPacketUnmarshaller.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/PacketMarshaller.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/PacketMarshaller.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/PingPkt.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/PingPkt.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/Pkt.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/UnSubPkt.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Packet/UnSubPkt.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Server/SOEPServer.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Server/SOEPServer.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/RuleR0.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/RuleR0.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/RuleR1.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/RuleR1.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/TestResultListener.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/TestResultListener.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/TestRule.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Test/TestRule.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Util/CharVector.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Util/Logging.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Util/Logging.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Util/TRexUtils.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/Util/TRexUtils.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/connection.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/external.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/packet.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/server.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/test.hpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/src/util.hpp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/TRex2-lib/run_debug_configure" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/TRex/TRex2-lib/run_production_configure" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/cmake-build-debug/TRexServer.cbp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/cmake-build-debug/instrumented_trex_plus_configs_and_scripts.cbp" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/cmake-build-debug/processing-delay-models.cbp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex" beforeDir="false" afterPath="$PROJECT_DIR$/TRex" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/LICENCE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/configure.ac" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/m4/ax_cxx_compile_stdcxx.m4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/m4/boost.m4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/Connection.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/Connection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/ConnectionProxy.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/ConnectionProxy.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/PubPktListener.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/PubPktListener.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/SubscriptionTable.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/SubscriptionTable.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Main.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Makefile.am" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/BufferedPacketUnmarshaller.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/BufferedPacketUnmarshaller.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PacketMarshaller.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PacketMarshaller.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PingPkt.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/PingPkt.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/Pkt.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/UnSubPkt.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Packet/UnSubPkt.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Server/SOEPServer.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Server/SOEPServer.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR0.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR0.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR1.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/RuleR1.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestResultListener.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestResultListener.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestRule.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Test/TestRule.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/CharVector.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/Logging.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/Logging.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/TRexUtils.cpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Util/TRexUtils.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/connection.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/external.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/packet.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/server.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/test.hpp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/util.hpp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex-Server/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex-Server/src/Connection/RequestHandler.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/StacksRule.cc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc" beforeDir="false" afterPath="$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc" afterDir="false" />
     </list>
@@ -166,8 +163,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="482">
-              <caret line="286" lean-forward="true" selection-start-line="286" selection-end-line="286" />
+            <state relative-caret-position="347">
+              <caret line="277" column="40" lean-forward="true" selection-start-line="277" selection-start-column="40" selection-end-line="277" selection-end-column="40" />
               <folding>
                 <element signature="e#7526#7554#0" expanded="true" />
               </folding>
@@ -405,12 +402,12 @@
       <workItem from="1535361733128" duration="13000" />
       <workItem from="1535361759610" duration="446000" />
       <workItem from="1539525486675" duration="1139000" />
-      <workItem from="1539673453427" duration="950000" />
+      <workItem from="1539673453427" duration="1224000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="9920000" />
+    <option name="totallyTimeSpent" value="10194000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-1" y="175" width="1922" height="1083" extended-state="6" />
@@ -500,8 +497,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/TRex/TRex2-lib/src/Engine/TRexEngine.cc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="482">
-          <caret line="286" lean-forward="true" selection-start-line="286" selection-end-line="286" />
+        <state relative-caret-position="347">
+          <caret line="277" column="40" lean-forward="true" selection-start-line="277" selection-start-column="40" selection-end-line="277" selection-end-column="40" />
           <folding>
             <element signature="e#7526#7554#0" expanded="true" />
           </folding>

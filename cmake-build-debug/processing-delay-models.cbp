@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="processing-delay-models"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Build-debug-configuration">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 Build-debug-configuration"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="Build-optimized-configuration">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 Build-optimized-configuration"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="TelosB">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 TelosB"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="gnex">
+				<Option working_dir="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 gnex"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/espen/Research/A-Methodology-to-Model-the-Execution-of-Communication-Software-for-Accurate-Network-Simulation/instrumented-code-plus-output/instrumented-trex-plus-configs-and-scripts/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
