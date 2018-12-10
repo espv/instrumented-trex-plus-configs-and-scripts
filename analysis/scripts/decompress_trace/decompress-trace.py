@@ -7,6 +7,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 # FEMs
 # - Enqueue packet on cc2420::rx. Check if currently overflow on chip, return if so. Check for overflow, and set flag if so.
@@ -188,15 +189,19 @@ printed = False
 
 
 def eid_to_event(e, cycles):
-	res = trace_id_to_CSEW_events.get(e)
+	res = trace_id_to_CSEW_events.get(e, "")
 
-	return res.replace("[CPU_CYCLES]", cycles, -1)
+	return res.replace("[CPU_CYCLES]", str(cycles), -1)
 
 
 class TestApp(App):
 
 	def __init__(self):
 		super(TestApp, self).__init__()
+		content = Button(text='Success')
+		self.popup = Popup(title='Decompression finished', content=content,
+						   auto_dismiss=True)
+		content.bind(on_press=self.popup.dismiss)
 		self.bl = BoxLayout(orientation='vertical')
 
 	def select_trace_file(self, instance):
@@ -216,20 +221,19 @@ class TestApp(App):
 				if len(line) < 2:
 					break
 
-				eid = int(l[0])
+				eid = int(line[0])
 				i += 1
-				cycles = int(l[3])
+				cycles = int(line[3])
 				output_file.write(eid_to_event(eid, cycles)+"\n")
 			output_file.write("H		\n")
 
+		self.popup.open()
+
 	def build(self):
-		self.bl.add_widget(Label(text='Select trace file to analyze'))
-		pathlist = [(os.stat('../../traces/'+p.name).st_mtime, p) for p in Path('../../traces').glob('**/*.trace')]
-		pathlist = sorted(y for (x, y) in sorted(pathlist, key=lambda s: s[0]))
-		for i, path in enumerate(pathlist):
-			# because path is object not string
-			fn = path.name
-			# print(path_in_str)
+		self.bl.add_widget(Label(text='Select trace file to decompress to CSEM events'))
+		pathlist = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
+		pathlist.sort(key=lambda s: s[0])
+		for i, (time, fn) in enumerate(pathlist):
 			if i == 0:
 				self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down'))
 			else:
@@ -238,11 +242,11 @@ class TestApp(App):
 		select_button = Button(text="Select")
 		select_button.bind(on_press=self.select_trace_file)
 		self.bl.add_widget(select_button)
+		exit_button = Button(text="Exit")
+		exit_button.bind(on_press=lambda _: exit(0))
+		self.bl.add_widget(exit_button)
 		return self.bl
 
 
 if __name__ == '__main__':
 	TestApp().run()
-	import time
-	while True:
-		time.sleep(1)

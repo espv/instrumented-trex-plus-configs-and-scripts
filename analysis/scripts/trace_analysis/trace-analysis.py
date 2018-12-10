@@ -8,6 +8,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.button import Button
 from kivy.uix.label import Label
+from kivy.uix.popup import Popup
 
 from openpyxl_templates import TemplatedWorkbook
 from openpyxl_templates.table_sheet import TableSheet
@@ -162,6 +163,10 @@ class TestApp(App):
 
     def __init__(self):
         super(TestApp, self).__init__()
+        content = Button(text='Success')
+        self.popup = Popup(title='Analysis finished', content=content,
+                           auto_dismiss=True)
+        content.bind(on_press=self.popup.dismiss)
         self.bl = BoxLayout(orientation='vertical')
 
     def select_trace_file(self, instance):
@@ -177,13 +182,13 @@ class TestApp(App):
             trace.regular_as_xlsx()
             trace.traceid_as_xlsx()
 
+        self.popup.open()
+
     def build(self):
         self.bl.add_widget(Label(text='Select trace file to analyze'))
-        pathlist = [(os.stat('../../traces/'+p.name).st_mtime, p) for p in Path('../../traces').glob('**/*.trace')]
-        pathlist = sorted(y for (x, y) in sorted(pathlist, key=lambda s: s[0]))
-        for i, path in enumerate(pathlist):
-            # because path is object not string
-            fn = path.name
+        pathlist = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
+        pathlist.sort(key=lambda s: s[0])
+        for i, (time, fn) in enumerate(pathlist):
             # print(path_in_str)
             if i == 0:
                 self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down'))
@@ -192,7 +197,10 @@ class TestApp(App):
 
         select_button = Button(text="Select")
         select_button.bind(on_press=self.select_trace_file)
+        exit_button = Button(text="Exit")
+        exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(select_button)
+        self.bl.add_widget(exit_button)
         return self.bl
 
 TestApp().run()
