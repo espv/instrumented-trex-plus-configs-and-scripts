@@ -67,7 +67,7 @@ class Trace():
     def collect_data(self):
         previous_time = 0
         for l in self.trace:
-            split_l = re.split('\t|\n', l)
+            split_l = re.split('[\t\n]', l)
             traceId = int(split_l[0])
             cpuId = int(split_l[1])
             threadId = int(split_l[2])
@@ -203,4 +203,6 @@ class TestApp(App):
         self.bl.add_widget(exit_button)
         return self.bl
 
-TestApp().run()
+
+if __name__ == '__main__':
+    TestApp().run()

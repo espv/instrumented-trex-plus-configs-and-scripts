@@ -204,7 +204,7 @@ class TestApp(App):
 		content.bind(on_press=self.popup.dismiss)
 		self.bl = BoxLayout(orientation='vertical')
 
-	def select_trace_file(self, instance):
+	def select_trace_file(self, _):
 		selected_tb = None
 		for c in self.bl.children:
 			if isinstance(c, ToggleButton) and c.state == 'down':
