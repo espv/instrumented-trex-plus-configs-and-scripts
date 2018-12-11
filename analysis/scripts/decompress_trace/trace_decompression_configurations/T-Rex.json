@@ -1,0 +1,14 @@
+{
+  "traceIdsToCSEMEvents": {
+    "0": {
+      "id": "0",
+      "csemEvents": "HIRQENTRY 0 1 [CPU_CYCLES] 1 0 0 interruptfifop_fired s\n",
+      "description": "Hardware interrupt entry event for HIRQ-1"
+    },
+    "1": {
+      "id": "1",
+      "csemEvents": "TEMPSYNCH 0 1 [CPU_CYCLES] 1 0 1 (TEMP) readDoneLength\n",
+      "description": ""
+    }
+  }
+}
