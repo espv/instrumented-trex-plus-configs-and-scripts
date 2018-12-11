@@ -32,6 +32,7 @@ class TraceSheet(TableSheet):
     cpu_id = CharColumn()
     thread_id = CharColumn()
     timestamp = CharColumn()
+    time_diff = IntColumn()
 
 
 class TraceIdSheet(TableSheet):
@@ -40,6 +41,7 @@ class TraceIdSheet(TableSheet):
     cpu_id = CharColumn()
     thread_id = CharColumn()
     timestamp = IntColumn()
+    time_diff = IntColumn()
 
 
 class TraceWorkBook(TemplatedWorkbook):
@@ -47,7 +49,7 @@ class TraceWorkBook(TemplatedWorkbook):
     trace_id_trace_entries = TraceIdSheet()
 
 
-class TraceEntry():
+class TraceEntry(object):
     def __init__(self, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff):
         self.trace_id = trace_id
         self.cpu_id = cpu_id
@@ -57,13 +59,14 @@ class TraceEntry():
 
 
 class Trace(object):
-    def __init__(self, trace, output_fn, possible_trace_event_transitions):
+    def __init__(self, trace, output_fn, possible_trace_event_transitions, reverse_possible_trace_event_transitions):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
         self.wb = TraceWorkBook()
         self.output_fn = output_fn
         self.possible_trace_event_transitions = possible_trace_event_transitions
+        self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
         self.numpy_rows = None
     
     def collect_data(self):
@@ -71,14 +74,15 @@ class Trace(object):
         for l in self.trace:
             split_l = re.split('[\t\n]', l)
             trace_id = int(split_l[0])
-            previous_time = self.possible_trace_event_transitions.get(trace_id, [0]).pop()
+            previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
+            previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
             cpu_id = int(split_l[1])
             thread_id = int(split_l[2])
             t = int(split_l[3])
             if trace_id == FIRST_trace_id:
                 previous_time = t
             self.rows.append(TraceEntry(trace_id, thread_id, cpu_id, t, t-previous_time))
-            previous_times.setdefault(trace_id, []).append(t)
+            previous_times.setdefault(str(trace_id), []).append(t)
 
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
         print(self.numpy_rows)
@@ -148,7 +152,7 @@ class Trace(object):
     def regular_as_xlsx(self):
         self.wb.regular_trace_entries.write(
             title="Trace",
-            objects=((te.trace_id, te.cpu_id, te.thread_id, te.timestamp) for te in self.rows)
+            objects=((te.trace_id, te.cpu_id, te.thread_id, te.timestamp, te.cur_prev_time_diff) for te in self.rows)
         )
 
         self.wb.save(self.output_fn)
@@ -171,7 +175,8 @@ class TestApp(App):
                            auto_dismiss=True)
         content.bind(on_press=self.popup.dismiss)
         self.bl = BoxLayout(orientation='vertical')
-        self.possible_trace_event_transitions = []
+        self.possible_trace_event_transitions = {}
+        self.reverse_possible_trace_event_transitions = {}
 
     def select_trace_file(self, _):
         selected_tb = None
@@ -181,7 +186,7 @@ class TestApp(App):
                 break
         if selected_tb is not None:
             trace_file = open('../../traces/'+selected_tb.text, 'r')
-            trace = Trace(trace_file, "processed-"+trace_file.name.split(".")[0]+".xlsx", self.possible_trace_event_transitions)
+            trace = Trace(trace_file, selected_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions)
             trace.collect_data()
             trace.regular_as_xlsx()
             trace.trace_id_as_xlsx()
@@ -199,7 +204,10 @@ class TestApp(App):
             json_data=trace_file.read()
 
             data = json.loads(json_data)
-            self.possible_trace_event_transitions = data["possibleTransitions"]
+            self.possible_trace_event_transitions = data["possibleTransitions"]  # A trace Id can be followed by one or more trace Ids
+            for k, v in self.possible_trace_event_transitions.items():
+                for a in v:
+                    self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
 
         self.bl.clear_widgets(self.bl.children)
 
