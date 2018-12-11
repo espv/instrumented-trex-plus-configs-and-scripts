@@ -1,5 +1,6 @@
 
 import errno
+import json
 import os
 import re
 from pathlib import Path
@@ -55,27 +56,29 @@ class TraceEntry():
         self.cur_prev_time_diff = cur_prev_time_diff
 
 
-class Trace():
-    def __init__(self, trace, output_fn):
+class Trace(object):
+    def __init__(self, trace, output_fn, possible_trace_event_transitions):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
         self.wb = TraceWorkBook()
         self.output_fn = output_fn
+        self.possible_trace_event_transitions = possible_trace_event_transitions
         self.numpy_rows = None
     
     def collect_data(self):
-        previous_time = 0
+        previous_times = {}
         for l in self.trace:
             split_l = re.split('[\t\n]', l)
             trace_id = int(split_l[0])
+            previous_time = self.possible_trace_event_transitions.get(trace_id, [0]).pop()
             cpu_id = int(split_l[1])
             thread_id = int(split_l[2])
             t = int(split_l[3])
             if trace_id == FIRST_trace_id:
                 previous_time = t
             self.rows.append(TraceEntry(trace_id, thread_id, cpu_id, t, t-previous_time))
-            previous_time = t
+            previous_times.setdefault(trace_id, []).append(t)
 
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
         print(self.numpy_rows)
@@ -168,6 +171,7 @@ class TestApp(App):
                            auto_dismiss=True)
         content.bind(on_press=self.popup.dismiss)
         self.bl = BoxLayout(orientation='vertical')
+        self.possible_trace_event_transitions = []
 
     def select_trace_file(self, _):
         selected_tb = None
@@ -177,14 +181,28 @@ class TestApp(App):
                 break
         if selected_tb is not None:
             trace_file = open('../../traces/'+selected_tb.text, 'r')
-            trace = Trace(trace_file, "processed-"+trace_file.name.split(".")[0]+".xlsx")
+            trace = Trace(trace_file, "processed-"+trace_file.name.split(".")[0]+".xlsx", self.possible_trace_event_transitions)
             trace.collect_data()
             trace.regular_as_xlsx()
             trace.trace_id_as_xlsx()
 
         self.popup.open()
 
-    def build(self):
+    def select_traceid_to_csem_events_map_file(self, _):
+        selected_tb = None
+        for c in self.bl.children:
+            if isinstance(c, ToggleButton) and c.state == 'down':
+                selected_tb = c
+                break
+        if selected_tb is not None:
+            trace_file = open('../decompress_trace/trace_decompression_configurations/'+selected_tb.text, 'r')
+            json_data=trace_file.read()
+
+            data = json.loads(json_data)
+            self.possible_trace_event_transitions = data["possibleTransitions"]
+
+        self.bl.clear_widgets(self.bl.children)
+
         self.bl.add_widget(Label(text='Select trace file to analyze'))
         path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
         path_list.sort(key=lambda s: s[0])
@@ -199,6 +217,24 @@ class TestApp(App):
         exit_button = Button(text="Exit")
         exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(select_button)
+        self.bl.add_widget(exit_button)
+        return self.bl
+
+    def build(self):
+        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
+        path_list = [(os.stat('../decompress_trace/trace_decompression_configurations/'+p.name).st_mtime, p.name) for p in Path('../decompress_trace/trace_decompression_configurations/').glob('**/*.json')]
+        path_list.sort(key=lambda s: s[0])
+        for i, (time, fn) in enumerate(path_list):
+            if i == 0:
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down'))
+            else:
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file"))
+
+        select_button = Button(text="Select")
+        select_button.bind(on_press=self.select_traceid_to_csem_events_map_file)
+        self.bl.add_widget(select_button)
+        exit_button = Button(text="Exit")
+        exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(exit_button)
         return self.bl
 
