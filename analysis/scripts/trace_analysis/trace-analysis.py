@@ -28,20 +28,26 @@ np.set_printoptions(edgeitems=30, linewidth=100000,
 
 
 class TraceSheet(TableSheet):
+    line_nr = IntColumn()
     trace_id = CharColumn()
     cpu_id = CharColumn()
     thread_id = CharColumn()
     timestamp = CharColumn()
     time_diff = IntColumn()
+    rdtsc = IntColumn()
+    rdtsc_diff = IntColumn()
 
 
 class TraceIdSheet(TableSheet):
+    line_nr = IntColumn()
     trace_idFrom = CharColumn()
     trace_idTo = CharColumn()
     cpu_id = CharColumn()
     thread_id = CharColumn()
     timestamp = IntColumn()
     time_diff = IntColumn()
+    rdtsc = IntColumn()
+    rdtsc_diff = IntColumn()
 
 
 class TraceWorkBook(TemplatedWorkbook):
@@ -50,12 +56,15 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff):
+    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff, rdtsc, cur_prev_rdtsc_diff):
+        self.line_nr = line_nr
         self.trace_id = trace_id
         self.cpu_id = cpu_id
         self.thread_id = thread_id
         self.timestamp = timestamp
         self.cur_prev_time_diff = cur_prev_time_diff
+        self.rdtsc = rdtsc
+        self.cur_prev_rdtsc_diff = cur_prev_rdtsc_diff
 
 
 class Trace(object):
@@ -71,20 +80,24 @@ class Trace(object):
     
     def collect_data(self):
         previous_times = {}
-        for l in self.trace:
+        previous_rdtscs = {}
+        for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
             trace_id = int(split_l[0])
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
             previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
+            previous_rdtsc = previous_rdtscs.get(str(previous_trace_id), [0]).pop()
             cpu_id = int(split_l[1])
             thread_id = int(split_l[2])
             t = int(split_l[3])
+            rdtsc = int(split_l[4])
             if trace_id == FIRST_trace_id:
                 previous_time = t
-            self.rows.append(TraceEntry(trace_id, thread_id, cpu_id, t, t-previous_time))
+            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time, rdtsc, rdtsc-previous_rdtsc))
             previous_times.setdefault(str(trace_id), []).append(t)
+            previous_rdtscs.setdefault(str(trace_id), []).append(rdtsc)
 
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.cur_prev_rdtsc_diff] for te in self.rows])
         print(self.numpy_rows)
         print("\n")
         grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
@@ -142,7 +155,13 @@ class Trace(object):
                 plt.title("Normalized processing delay histogram for processing stage "+str(i))
                 plt.xlabel("Processing delay")
                 plt.ylabel("Occurrences ratio")
-                sns_plot = sns.distplot(group)
+                import pandas as pd
+                df = pd.DataFrame()
+                df['GDP (BILLIONS)'] = 2000*1./(np.random.random(250))
+                df.sort_values(by='GDP (BILLIONS)',ascending=False, inplace=True)
+                LogMin, LogMax = np.log10(df['GDP (BILLIONS)'].min()),np.log10(df['GDP (BILLIONS)'].max())
+                newBins = np.logspace(LogMin, LogMax,8)
+                sns_plot = sns.distplot(group, bins=newBins)
                 fig = sns_plot.get_figure()
                 fig.savefig('output/'+trace_file_id+'/processing-stage-'+str(i)+'.png')
                 plt.show()
@@ -152,7 +171,7 @@ class Trace(object):
     def regular_as_xlsx(self):
         self.wb.regular_trace_entries.write(
             title="Trace",
-            objects=((te.trace_id, te.cpu_id, te.thread_id, te.timestamp, te.cur_prev_time_diff) for te in self.rows)
+            objects=((te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.rdtsc, te.cur_prev_rdtsc_diff) for te in self.rows)
         )
 
         self.wb.save(self.output_fn)
