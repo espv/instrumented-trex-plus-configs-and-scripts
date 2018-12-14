@@ -3,6 +3,7 @@ import errno
 import json
 import os
 import re
+from collections import OrderedDict
 from pathlib import Path
 
 import numpy as np
@@ -100,9 +101,20 @@ class Trace(object):
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.cur_prev_rdtsc_diff] for te in self.rows])
         print(self.numpy_rows)
         print("\n")
-        grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
-        for r in grouped_by_trace_id:
+        tmp_grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
+        for r in tmp_grouped_by_trace_id:
             print(r, "\n")
+
+        grouped_by_trace_id = []
+
+        def get_index_in_dag(event_type, dag):
+            for i, (k, _) in enumerate(dag.items()):
+                if str(event_type) == k:
+                    return i
+            return -1
+        for group_tmp in tmp_grouped_by_trace_id:
+            group_tmp_index = get_index_in_dag(group_tmp[0][0], self.possible_trace_event_transitions)
+            grouped_by_trace_id.insert(group_tmp_index, group_tmp)
 
         y_hist = []
         for group in grouped_by_trace_id:
@@ -225,9 +237,9 @@ class TestApp(App):
                 break
         if selected_tb is not None:
             trace_file = open('../decompress_trace/trace_decompression_configurations/'+selected_tb.text, 'r')
-            json_data=trace_file.read()
+            json_data = trace_file.read()
 
-            data = json.loads(json_data)
+            data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
             self.possible_trace_event_transitions = data["possibleTransitions"]  # A trace Id can be followed by one or more trace Ids
             for k, v in self.possible_trace_event_transitions.items():
                 for a in v:
