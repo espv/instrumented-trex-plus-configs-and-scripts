@@ -154,19 +154,19 @@ class Trace(object):
 
         flattened_y = np.hstack(np.asarray([np.asarray(e) for e in y]).flatten())
         x = []
-        xticks = []
+        #xticks = []
         for i, e in enumerate(y):
             for _ in e:
                 x.append(i)
-                xticks.append(grouped_by_trace_id[i][0][0])
+                #xticks.append(grouped_by_trace_id[i][0][0])
 
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay")
-        unique, index = np.unique(xticks, return_inverse=True)
-        fig = plt.scatter(index, flattened_y).get_figure()
+        #unique, index = np.unique(xticks, return_inverse=True)
+        fig = plt.scatter(x, flattened_y).get_figure()
 
-        plt.xticks(range(len(unique)), unique)
+        plt.xticks(range(len(xticks)), xticks)
         fig.savefig('output/'+trace_file_id+'/scatter.png')
         plt.show()
 
