@@ -119,17 +119,20 @@ class Trace(object):
                 raise
         y = [[g[i][4] for i in range(len(g))] for g in grouped_by_trace_id]
         fig, ax = plt.subplots()
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
-        ax.plot(np.arange(len(grouped_by_trace_id)), np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
+        x = np.arange(len(grouped_by_trace_id))
+        xticks = [g[0][0] for i, g in enumerate(grouped_by_trace_id) if len(g) > 0 and len(g[0]) > 0]
+        plt.xticks(x, xticks)
+        ax.plot(x, np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
+        ax.plot(x, np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
+        ax.plot(x, np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
+        ax.plot(x, np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
+        ax.plot(x, np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
+        ax.plot(x, np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
+        ax.plot(x, np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
+        ax.plot(x, np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
+        ax.plot(x, np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
+        ax.plot(x, np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
+        ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
         plt.title("Processing delay percentiles")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay")
@@ -139,31 +142,33 @@ class Trace(object):
 
         flattened_y = np.hstack(np.asarray([np.asarray(e) for e in y]).flatten())
         x = []
+        xticks = []
         for i, e in enumerate(y):
             for _ in e:
                 x.append(i)
+                xticks.append(grouped_by_trace_id[i][0][0])
 
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay")
-        fig = plt.scatter(x, flattened_y).get_figure()
+        unique, index = np.unique(xticks, return_inverse=True)
+        fig = plt.scatter(index, flattened_y).get_figure()
+
+        plt.xticks(range(len(unique)), unique)
         fig.savefig('output/'+trace_file_id+'/scatter.png')
         plt.show()
 
-        for i, group in enumerate(y_hist):
+        for i, group in enumerate(y_hist[1:]):
             try:
-                plt.title("Normalized processing delay histogram for processing stage "+str(i))
+                proc_stage = str(grouped_by_trace_id[i+1][0][0])
+                proc_stage = str(grouped_by_trace_id[i][0][0]) + "-" + proc_stage
+                plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
                 plt.xlabel("Processing delay")
                 plt.ylabel("Occurrences ratio")
-                import pandas as pd
-                df = pd.DataFrame()
-                df['GDP (BILLIONS)'] = 2000*1./(np.random.random(250))
-                df.sort_values(by='GDP (BILLIONS)',ascending=False, inplace=True)
-                LogMin, LogMax = np.log10(df['GDP (BILLIONS)'].min()),np.log10(df['GDP (BILLIONS)'].max())
-                newBins = np.logspace(LogMin, LogMax,8)
-                sns_plot = sns.distplot(group, bins=newBins)
+                sns_plot = sns.distplot(group)
+                plt.xlim([0, np.percentile(group, 99)])
                 fig = sns_plot.get_figure()
-                fig.savefig('output/'+trace_file_id+'/processing-stage-'+str(i)+'.png')
+                fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
                 plt.show()
             except np.linalg.linalg.LinAlgError:
                 pass
