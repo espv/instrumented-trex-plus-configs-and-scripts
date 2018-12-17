@@ -1,0 +1,3 @@
+# First, run mkvirtualenv trace-analysis -a `pwd` --python=`which python3`
+# Then, run workon trace-analysis
+pip install seaborn matplotlib numpy-indexed openpyxl openpyxl-templates kivy pygame
