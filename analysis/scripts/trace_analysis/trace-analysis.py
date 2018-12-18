@@ -15,7 +15,9 @@ from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.progressbar import ProgressBar
 from matplotlib import pyplot as plt
+from openpyxl import Workbook
 from openpyxl_templates import TemplatedWorkbook
 from openpyxl_templates.table_sheet import TableSheet
 from openpyxl_templates.table_sheet.columns import CharColumn, IntColumn
@@ -73,7 +75,7 @@ class Trace(object):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
-        self.wb = TraceWorkBook()
+        self.wb = Workbook(write_only=True)  #TraceWorkBook(write_only=True)
         self.output_fn = output_fn
         self.possible_trace_event_transitions = possible_trace_event_transitions
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
@@ -98,6 +100,45 @@ class Trace(object):
             previous_times.setdefault(str(trace_id), []).append(t)
             previous_rdtscs.setdefault(str(trace_id), []).append(rdtsc)
 
+    def regular_as_xlsx(self, pb, popup, bl, btn):
+        ws = self.wb.create_sheet("Trace")
+
+        self.max = len(self.rows)+len(self.rows)*1.6
+        self.cnt = 0
+        from kivy.clock import Clock
+
+        def update_bar(_):
+            if self.cnt >= len(self.rows):
+                self.wb.save(self.output_fn)
+                popup.open()
+                self.cnt = self.max
+                bl.add_widget(btn, 3)
+                bl.clear_widgets([pb])
+                return
+            else:
+                self.update_bar_trigger()
+            pb.value = self.cnt
+            te = self.rows[self.cnt]
+            self.cnt += 1
+            row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.rdtsc, te.cur_prev_rdtsc_diff]
+            ws.append(row)
+
+        self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
+        Clock.max_iteration = 100
+
+        self.update_bar_trigger()
+
+    def trace_id_as_xlsx(self):
+        pass
+        #ws = self.wb.create_sheet("Trace ID analytics")
+        #self.wb.trace_id_trace_entries.write(
+        #    title="Trace ID analytics",
+        #    objects=()
+        #)
+
+        #self.wb.save('output/'+self.output_fn)
+
+    def as_plots(self):
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.cur_prev_rdtsc_diff] for te in self.rows])
         print(self.numpy_rows)
         print("\n")
@@ -185,22 +226,6 @@ class Trace(object):
             except np.linalg.linalg.LinAlgError:
                 pass
 
-    def regular_as_xlsx(self):
-        self.wb.regular_trace_entries.write(
-            title="Trace",
-            objects=((te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.rdtsc, te.cur_prev_rdtsc_diff) for te in self.rows)
-        )
-
-        self.wb.save(self.output_fn)
-
-    def trace_id_as_xlsx(self):
-        self.wb.trace_id_trace_entries.write(
-            title="Trace ID analytics",
-            objects=()
-        )
-
-        self.wb.save(self.output_fn)
-
 
 class TestApp(App):
 
@@ -213,40 +238,83 @@ class TestApp(App):
         self.bl = BoxLayout(orientation='vertical')
         self.possible_trace_event_transitions = {}
         self.reverse_possible_trace_event_transitions = {}
+        self.trace_id_to_CSEW_events = {}
+        self.selected_trace_tb = None
+        self.trace_file = None
+        self.trace = None
 
-    def select_trace_file(self, _):
-        selected_tb = None
-        for c in self.bl.children:
-            if isinstance(c, ToggleButton) and c.state == 'down':
-                selected_tb = c
-                break
-        if selected_tb is not None:
-            trace_file = open('../../traces/'+selected_tb.text, 'r')
-            trace = Trace(trace_file, selected_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions)
-            trace.collect_data()
-            trace.regular_as_xlsx()
-            trace.trace_id_as_xlsx()
-
+    def gen_plots(self, _):
+        if self.trace is not None:
+            self.trace.as_plots()
         self.popup.open()
 
-    def select_traceid_to_csem_events_map_file(self, _):
-        selected_tb = None
+    def gen_xlsx(self, btn: Button):
+        if self.trace is not None:
+            pb = ProgressBar(max=len(self.trace.rows)*1.6, value=0)
+            self.bl.clear_widgets([btn])
+            self.bl.add_widget(pb, 3)
+            self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
+            self.trace.trace_id_as_xlsx()
+
+        #self.popup.open()
+
+    def select_trace_file(self, _):
+        self.selected_trace_tb = None
         for c in self.bl.children:
             if isinstance(c, ToggleButton) and c.state == 'down':
-                selected_tb = c
+                self.selected_trace_tb = c
                 break
-        if selected_tb is not None:
-            trace_file = open('../decompress_trace/trace_decompression_configurations/'+selected_tb.text, 'r')
-            json_data = trace_file.read()
-
-            data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
-            self.possible_trace_event_transitions = data["possibleTransitions"]  # A trace Id can be followed by one or more trace Ids
-            for k, v in self.possible_trace_event_transitions.items():
-                for a in v:
-                    self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
 
         self.bl.clear_widgets(self.bl.children)
 
+        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text))
+        gen_plots_btn = Button(text="Analyze data and generate plots")
+        gen_plots_btn.bind(on_press=self.gen_plots)
+        self.bl.add_widget(gen_plots_btn)
+        gen_xlsx_btn = Button(text="Analyze data and export to excel")
+        gen_xlsx_btn.bind(on_press=self.gen_xlsx)
+        self.bl.add_widget(gen_xlsx_btn)
+        decomp_trace_btn = Button(text="Decompress trace")
+        decomp_trace_btn.bind(on_press=self.decompress_trace)
+        self.bl.add_widget(decomp_trace_btn)
+        back_btn = Button(text="Back")
+        back_btn.bind(on_press=self.select_trace_to_analyze)
+        self.bl.add_widget(back_btn)
+        exit_btn = Button(text="Exit")
+        exit_btn.bind(on_press=lambda _: exit(0))
+        self.bl.add_widget(exit_btn)
+
+        self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
+        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions)
+        self.trace.collect_data()
+
+    def eid_to_event(self, e, cycles):
+        res = self.trace_id_to_CSEW_events.get(e, {}).get('csemEvents', "")
+
+        return res.replace("[CPU_CYCLES]", str(cycles), -1)
+
+    def decompress_trace(self, _):
+        if self.trace_file is not None:
+            self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
+
+            output_file = open("output/processed-"+self.selected_trace_tb.text, "w")
+            output_file.write("EOD\n")
+            i = 0
+            for l in self.trace_file:
+                line = l.split("\t")
+                if len(line) < 2:
+                    break
+
+                eid = int(line[0])
+                i += 1
+                cycles = int(line[3])
+                output_file.write(self.eid_to_event(eid, cycles)+"\n")
+            output_file.write("H        \n")
+
+        self.popup.open()
+
+    def select_trace_to_analyze(self, _):
+        self.bl.clear_widgets(self.bl.children)
         self.bl.add_widget(Label(text='Select trace file to analyze'))
         path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
         path_list.sort(key=lambda s: s[0])
@@ -264,6 +332,24 @@ class TestApp(App):
         self.bl.add_widget(exit_button)
         return self.bl
 
+    def selected_traceid_to_csem_events_map_file(self, _):
+        selected_tb = None
+        for c in self.bl.children:
+            if isinstance(c, ToggleButton) and c.state == 'down':
+                selected_tb = c
+                break
+        if selected_tb is not None:
+            trace_file = open('../decompress_trace/trace_decompression_configurations/'+selected_tb.text, 'r')
+            json_data = trace_file.read()
+
+            data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
+            self.possible_trace_event_transitions = data["possibleTransitions"]  # A trace Id can be followed by one or more trace Ids
+            for k, v in self.possible_trace_event_transitions.items():
+                for a in v:
+                    self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
+
+        return self.select_trace_to_analyze(_)
+
     def build(self):
         self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
         path_list = [(os.stat('../decompress_trace/trace_decompression_configurations/'+p.name).st_mtime, p.name) for p in Path('../decompress_trace/trace_decompression_configurations/').glob('**/*.json')]
@@ -275,7 +361,7 @@ class TestApp(App):
                 self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file"))
 
         select_button = Button(text="Select")
-        select_button.bind(on_press=self.select_traceid_to_csem_events_map_file)
+        select_button.bind(on_press=self.selected_traceid_to_csem_events_map_file)
         self.bl.add_widget(select_button)
         exit_button = Button(text="Exit")
         exit_button.bind(on_press=lambda _: exit(0))
