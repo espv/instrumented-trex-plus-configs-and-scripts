@@ -87,14 +87,21 @@ class Trace(object):
         previous_rdtscs = {}
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
-            trace_id = int(split_l[0])
+            if len(split_l) < 5:
+                return -1
+
+            try:
+                trace_id = int(split_l[0])
+                cpu_id = int(split_l[1])
+                thread_id = int(split_l[2])
+                t = int(split_l[3])
+                rdtsc = int(split_l[4])
+            except ValueError:
+                return -1
+
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
             previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
             previous_rdtsc = previous_rdtscs.get(str(previous_trace_id), [0]).pop()
-            cpu_id = int(split_l[1])
-            thread_id = int(split_l[2])
-            t = int(split_l[3])
-            rdtsc = int(split_l[4])
             if trace_id == FIRST_trace_id:
                 previous_time = t
             self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time, rdtsc, rdtsc-previous_rdtsc))
@@ -237,6 +244,9 @@ class TestApp(App):
         self.popup = Popup(title='Analysis finished', content=content,
                            auto_dismiss=True)
         content.bind(on_press=self.popup.dismiss)
+        error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.')
+        self.error_in_trace_popup = Popup(title='Error', content=error_content)
+        error_content.bind(on_press=self.error_in_trace_popup.dismiss)
         self.bl = BoxLayout(orientation='vertical')
         self.possible_trace_event_transitions = {}
         self.reverse_possible_trace_event_transitions = {}
@@ -257,13 +267,7 @@ class TestApp(App):
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
 
-    def select_trace_file(self, _):
-        self.selected_trace_tb = None
-        for c in self.bl.children:
-            if isinstance(c, ToggleButton) and c.state == 'down':
-                self.selected_trace_tb = c
-                break
-
+    def parse_trace_file(self):
         self.bl.clear_widgets(self.bl.children)
 
         self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text))
@@ -277,7 +281,7 @@ class TestApp(App):
         decomp_trace_btn.bind(on_press=self.decompress_trace)
         self.bl.add_widget(decomp_trace_btn)
         back_btn = Button(text="Back")
-        back_btn.bind(on_press=self.select_trace_to_analyze)
+        back_btn.bind(on_press=self.clear_and_select_trace)
         self.bl.add_widget(back_btn)
         exit_btn = Button(text="Exit")
         exit_btn.bind(on_press=lambda _: exit(0))
@@ -285,7 +289,20 @@ class TestApp(App):
 
         self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
         self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions)
-        self.trace.collect_data()
+
+        if self.trace.collect_data() == -1:
+            self.bl.clear_widgets(self.bl.children)
+            self.error_in_trace_popup.open()
+            self.select_trace_to_analyze()
+
+    def select_trace_file(self, _):
+        self.selected_trace_tb = None
+        for c in self.bl.children:
+            if isinstance(c, ToggleButton) and c.state == 'down':
+                self.selected_trace_tb = c
+                break
+
+        self.parse_trace_file()
 
     def eid_to_event(self, e, cycles):
         res = self.trace_id_to_CSEW_events.get(e, {}).get('csemEvents', "")
@@ -312,8 +329,7 @@ class TestApp(App):
 
         self.popup.open()
 
-    def select_trace_to_analyze(self, _):
-        self.bl.clear_widgets(self.bl.children)
+    def select_trace_to_analyze(self):
         self.bl.add_widget(Label(text='Select trace file to analyze'))
         path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
         path_list.sort(key=lambda s: s[0])
@@ -331,6 +347,10 @@ class TestApp(App):
         self.bl.add_widget(exit_button)
         return self.bl
 
+    def clear_and_select_trace(self, _):
+        self.bl.clear_widgets(self.bl.children)
+        self.select_trace_to_analyze()
+
     def selected_traceid_to_csem_events_map_file(self, _):
         selected_tb = None
         for c in self.bl.children:
@@ -347,7 +367,7 @@ class TestApp(App):
                 for a in v:
                     self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
 
-        return self.select_trace_to_analyze(_)
+        return self.clear_and_select_trace(None)
 
     def build(self):
         self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
