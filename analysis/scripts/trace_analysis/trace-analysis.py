@@ -10,12 +10,13 @@ import numpy as np
 import numpy_indexed as npi
 import seaborn as sns
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from kivy.uix.togglebutton import ToggleButton
 from kivy.uix.progressbar import ProgressBar
+from kivy.uix.togglebutton import ToggleButton
 from matplotlib import pyplot as plt
 from openpyxl import Workbook
 from openpyxl_templates import TemplatedWorkbook
@@ -102,14 +103,24 @@ class Trace(object):
 
     def regular_as_xlsx(self, pb, popup, bl, btn):
         ws = self.wb.create_sheet("Trace")
+        trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
+        try:
+            os.mkdir('output/'+trace_file_id)
+        except OSError as exc:  # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir('output/'+trace_file_id):
+                pass
+            else:
+                raise
 
         self.max = len(self.rows)+len(self.rows)*1.6
         self.cnt = 0
-        from kivy.clock import Clock
 
         def update_bar(_):
             if self.cnt >= len(self.rows):
-                self.wb.save(self.output_fn)
+                try:
+                    self.wb.save('output/'+trace_file_id+'/'+self.output_fn)
+                except FileNotFoundError:
+                    pass
                 popup.open()
                 self.cnt = self.max
                 bl.add_widget(btn, 3)
@@ -117,6 +128,7 @@ class Trace(object):
                 return
             else:
                 self.update_bar_trigger()
+
             pb.value = self.cnt
             te = self.rows[self.cnt]
             self.cnt += 1
@@ -127,16 +139,6 @@ class Trace(object):
         Clock.max_iteration = 100
 
         self.update_bar_trigger()
-
-    def trace_id_as_xlsx(self):
-        pass
-        #ws = self.wb.create_sheet("Trace ID analytics")
-        #self.wb.trace_id_trace_entries.write(
-        #    title="Trace ID analytics",
-        #    objects=()
-        #)
-
-        #self.wb.save('output/'+self.output_fn)
 
     def as_plots(self):
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.cur_prev_rdtsc_diff] for te in self.rows])
@@ -254,9 +256,6 @@ class TestApp(App):
             self.bl.clear_widgets([btn])
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
-            self.trace.trace_id_as_xlsx()
-
-        #self.popup.open()
 
     def select_trace_file(self, _):
         self.selected_trace_tb = None
