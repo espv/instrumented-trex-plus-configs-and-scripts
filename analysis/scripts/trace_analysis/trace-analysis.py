@@ -426,7 +426,7 @@ class TestApp(App):
                 selected_tb = c
                 break
         if selected_tb is not None:
-            trace_file = open('../decompress_trace/trace_decompression_configurations/'+selected_tb.text, 'r')
+            trace_file = open('trace-configurations/'+selected_tb.text, 'r')
             json_data = trace_file.read()
 
             data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
@@ -440,7 +440,7 @@ class TestApp(App):
 
     def build(self):
         self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
-        path_list = [(os.stat('../decompress_trace/trace_decompression_configurations/'+p.name).st_mtime, p.name) for p in Path('../decompress_trace/trace_decompression_configurations/').glob('**/*.json')]
+        path_list = [(os.stat('trace-configurations/'+p.name).st_mtime, p.name) for p in Path('trace-configurations/').glob('**/*.json')]
         path_list.sort(key=lambda s: s[0])
         for i, (time, fn) in enumerate(path_list):
             if i == 0:
