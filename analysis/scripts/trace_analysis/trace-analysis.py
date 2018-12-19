@@ -33,6 +33,13 @@ np.set_printoptions(edgeitems=30, linewidth=100000,
                     formatter=dict(float=lambda x: "%.3g" % x))
 
 
+type_dict = {
+    "integer": int,
+    "float": float,
+    "string": str
+}
+
+
 class TraceSheet(TableSheet):
     line_nr = IntColumn()
     trace_id = CharColumn()
@@ -78,28 +85,35 @@ class Trace(object):
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
         self.traceAttrs = traceAttrs
         self.numpy_rows = None
+        self.max = len(self.rows)+len(self.rows)*1.6
+        self.cnt = 0
     
     def collect_data(self):
         previous_times = {}
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
-            if len(split_l) < 5:
+            if len(split_l) < len(self.traceAttrs):
                 return -1
 
             try:
-                trace_id = int(split_l[0])
-                cpu_id = int(split_l[1])
-                thread_id = int(split_l[2])
-                t = int(split_l[3])
+                # Depending on the configuration file, the trace event format might be different
+                trace_attr = self.traceAttrs['traceId']
+                trace_id = type_dict[trace_attr['type']](split_l[int(trace_attr['position'])])
+                cpu_attr = self.traceAttrs['cpuId']
+                cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
+                thread_attr = self.traceAttrs['threadId']
+                thread_id = type_dict[thread_attr['type']](split_l[int(thread_attr['position'])])
+                timestamp_attr = self.traceAttrs['timestamp']
+                timestamp = type_dict[timestamp_attr['type']](split_l[int(timestamp_attr['position'])])
             except ValueError:
                 return -1
 
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
             previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
             if trace_id == FIRST_trace_id:
-                previous_time = t
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time))
-            previous_times.setdefault(str(trace_id), []).append(t)
+                previous_time = timestamp
+            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time))
+            previous_times.setdefault(str(trace_id), []).append(timestamp)
 
     @staticmethod
     def adjust_col_width(ws):
@@ -116,31 +130,17 @@ class Trace(object):
             ws.column_dimensions[column].width = adjusted_width
 
     def regular_as_xlsx(self, pb, popup, bl, btn):
-        self.wb = Workbook()
+        self.wb = Workbook(write_only=True)
 
         ws = self.wb.create_sheet("Trace")
         self.wb.active = ws
-        ws.append(["Line number", "Trace ID", "Thread ID", "CPU ID", "Timestamp", "Timestamp diff"])
-        font = Font(bold=True, size=14)
-        a1 = ws['A1']  # type: Cell
-        a1.font = font
-        b1 = ws['B1']  # type: Cell
-        b1.font = font
-        c1 = ws['C1']  # type: Cell
-        c1.font = font
-        d1 = ws['D1']  # type: Cell
-        d1.font = font
-        e1 = ws['E1']  # type: Cell
-        e1.font = font
-        f1 = ws['F1']  # type: Cell
-        f1.font = font
+
         trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
         fn = 'output/'+trace_file_id+'/'+self.output_fn
         self.wb.save(fn)
         self.wb.close()
 
         self.wb = load_workbook(fn)
-        ws = self.wb.active
         try:
             os.mkdir('output/'+trace_file_id)
         except OSError as exc:  # Python >2.5
@@ -149,13 +149,37 @@ class Trace(object):
             else:
                 raise
 
-        self.max = len(self.rows)+len(self.rows)*1.6
         self.cnt = 0
 
         def update_bar(_):
             if self.cnt >= len(self.rows):
                 try:
-                    self.adjust_col_width(ws)
+                    self.wb.save(fn)
+                    self.wb.close()
+
+                    self.wb = load_workbook(fn)
+                    ws = self.wb.active
+                    font = Font(bold=True, size=14)
+                    a1 = ws['A1']  # type: Cell
+                    a1.font = font
+                    a1.value = "Line number"
+                    b1 = ws['B1']  # type: Cell
+                    b1.font = font
+                    b1.value = "Trace ID"
+                    c1 = ws['C1']  # type: Cell
+                    c1.font = font
+                    c1.value = "Thread ID"
+                    d1 = ws['D1']  # type: Cell
+                    d1.font = font
+                    d1.value = "CPU ID"
+                    e1 = ws['E1']  # type: Cell
+                    e1.font = font
+                    e1.value = "Timestamp"
+                    f1 = ws['F1']  # type: Cell
+                    f1.font = font
+                    f1.value = "Timestamp diff"
+
+                    self.adjust_col_width(self.wb.active)
                     self.wb.save(fn)
                     self.wb.close()
                 except FileNotFoundError:
@@ -172,7 +196,7 @@ class Trace(object):
             te = self.rows[self.cnt]
             self.cnt += 1
             row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
-            ws.append(row)
+            self.wb.active.append(row)
 
         self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
         Clock.max_iteration = 100
