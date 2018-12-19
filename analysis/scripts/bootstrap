@@ -1,3 +1,4 @@
 # First, run mkvirtualenv trace-analysis -a `pwd` --python=`which python3`
 # Then, run workon trace-analysis
+sudo apt-get install libglu1-mesa-dev freeglut3-dev mesa-common-dev
 pip install cython seaborn matplotlib numpy-indexed openpyxl openpyxl-templates kivy pygame
