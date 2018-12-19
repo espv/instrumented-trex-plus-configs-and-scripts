@@ -86,7 +86,7 @@ class Trace(object):
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
         self.traceAttrs = traceAttrs
         self.numpy_rows = None
-        self.max = len(self.rows)+len(self.rows)*1.5
+        self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
     
     def collect_data(self):
@@ -330,7 +330,7 @@ class TestApp(App):
 
     def gen_xlsx(self, btn: Button):
         if self.trace is not None:
-            pb = ProgressBar(max=len(self.trace.rows)*1.5, value=0)
+            pb = ProgressBar(max=len(self.trace.rows)*2, value=0)
             self.bl.clear_widgets([btn])
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
