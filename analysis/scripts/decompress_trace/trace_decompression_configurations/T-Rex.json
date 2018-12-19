@@ -42,5 +42,23 @@
       "csemEvents": "TEMPSYNCH 0 1 [CPU_CYCLES] 1 0 1 (TEMP) readDoneLength\n",
       "description": ""
     }
+  },
+  "traceAttributes": {
+    "traceId": {
+      "position": 0,
+      "type": "integer"
+    },
+    "cpuId": {
+      "position": 1,
+      "type": "integer"
+    },
+    "threadId": {
+      "position": 2,
+      "type": "integer"
+    },
+    "timestamp": {
+      "position": 3,
+      "type": "integer"
+    }
   }
 }

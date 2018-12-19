@@ -38,8 +38,6 @@ class TraceSheet(TableSheet):
     thread_id = CharColumn()
     timestamp = CharColumn()
     time_diff = IntColumn()
-    rdtsc = IntColumn()
-    rdtsc_diff = IntColumn()
 
 
 class TraceIdSheet(TableSheet):
@@ -50,8 +48,6 @@ class TraceIdSheet(TableSheet):
     thread_id = CharColumn()
     timestamp = IntColumn()
     time_diff = IntColumn()
-    rdtsc = IntColumn()
-    rdtsc_diff = IntColumn()
 
 
 class TraceWorkBook(TemplatedWorkbook):
@@ -60,19 +56,17 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff, rdtsc, cur_prev_rdtsc_diff):
+    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff):
         self.line_nr = line_nr
         self.trace_id = trace_id
         self.cpu_id = cpu_id
         self.thread_id = thread_id
         self.timestamp = timestamp
         self.cur_prev_time_diff = cur_prev_time_diff
-        self.rdtsc = rdtsc
-        self.cur_prev_rdtsc_diff = cur_prev_rdtsc_diff
 
 
 class Trace(object):
-    def __init__(self, trace, output_fn, possible_trace_event_transitions, reverse_possible_trace_event_transitions):
+    def __init__(self, trace, output_fn, possible_trace_event_transitions, reverse_possible_trace_event_transitions, traceAttrs):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
@@ -80,11 +74,11 @@ class Trace(object):
         self.output_fn = output_fn
         self.possible_trace_event_transitions = possible_trace_event_transitions
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
+        self.traceAttrs = traceAttrs
         self.numpy_rows = None
     
     def collect_data(self):
         previous_times = {}
-        previous_rdtscs = {}
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
             if len(split_l) < 5:
@@ -95,18 +89,15 @@ class Trace(object):
                 cpu_id = int(split_l[1])
                 thread_id = int(split_l[2])
                 t = int(split_l[3])
-                rdtsc = int(split_l[4])
             except ValueError:
                 return -1
 
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
             previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            previous_rdtsc = previous_rdtscs.get(str(previous_trace_id), [0]).pop()
             if trace_id == FIRST_trace_id:
                 previous_time = t
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time, rdtsc, rdtsc-previous_rdtsc))
+            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time))
             previous_times.setdefault(str(trace_id), []).append(t)
-            previous_rdtscs.setdefault(str(trace_id), []).append(rdtsc)
 
     def regular_as_xlsx(self, pb, popup, bl, btn):
         ws = self.wb.create_sheet("Trace")
@@ -139,16 +130,22 @@ class Trace(object):
             pb.value = self.cnt
             te = self.rows[self.cnt]
             self.cnt += 1
-            row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.rdtsc, te.cur_prev_rdtsc_diff]
+            row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
             ws.append(row)
 
         self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
         Clock.max_iteration = 100
 
+        ws.append(["Line number", "Trace ID", "Thread ID", "CPU ID", "Timestamp", "Timestamp diff"])
+        ws.oddHeader.center.text = "fffffffffffffffffff"
+        ws.oddHeader.center.size = 14
+        ws.oddHeader.center.font = "Tahoma,Bold"
+        ws.oddHeader.center.color = "CC3366"
+
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.cur_prev_rdtsc_diff] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
         print(self.numpy_rows)
         print("\n")
         tmp_grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
@@ -250,6 +247,7 @@ class TestApp(App):
         self.bl = BoxLayout(orientation='vertical')
         self.possible_trace_event_transitions = {}
         self.reverse_possible_trace_event_transitions = {}
+        self.traceAttrs = {}
         self.trace_id_to_CSEW_events = {}
         self.selected_trace_tb = None
         self.trace_file = None
@@ -288,7 +286,7 @@ class TestApp(App):
         self.bl.add_widget(exit_btn)
 
         self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
-        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions)
+        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions, self.traceAttrs)
 
         if self.trace.collect_data() == -1:
             self.bl.clear_widgets(self.bl.children)
@@ -366,6 +364,7 @@ class TestApp(App):
             for k, v in self.possible_trace_event_transitions.items():
                 for a in v:
                     self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
+            self.traceAttrs = data["traceAttributes"]
 
         return self.clear_and_select_trace(None)
 
