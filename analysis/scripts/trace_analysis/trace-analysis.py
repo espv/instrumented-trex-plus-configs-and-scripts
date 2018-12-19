@@ -18,7 +18,9 @@ from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.togglebutton import ToggleButton
 from matplotlib import pyplot as plt
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
+from openpyxl.cell import Cell
+from openpyxl.styles import Font
 from openpyxl_templates import TemplatedWorkbook
 from openpyxl_templates.table_sheet import TableSheet
 from openpyxl_templates.table_sheet.columns import CharColumn, IntColumn
@@ -70,7 +72,7 @@ class Trace(object):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
-        self.wb = Workbook(write_only=True)  #TraceWorkBook(write_only=True)
+        self.wb = None  #TraceWorkBook(write_only=True)
         self.output_fn = output_fn
         self.possible_trace_event_transitions = possible_trace_event_transitions
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
@@ -99,9 +101,46 @@ class Trace(object):
             self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, t, t-previous_time))
             previous_times.setdefault(str(trace_id), []).append(t)
 
+    @staticmethod
+    def adjust_col_width(ws):
+        for col in ws.columns:
+            max_length = 0
+            column = col[0].column  # Get the column name
+            for cell in col:
+                try:  # Necessary to avoid error on empty cells
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(cell.value)
+                except:
+                    pass
+            adjusted_width = (max_length + 3) * 1.2
+            ws.column_dimensions[column].width = adjusted_width
+
     def regular_as_xlsx(self, pb, popup, bl, btn):
+        self.wb = Workbook()
+
         ws = self.wb.create_sheet("Trace")
+        self.wb.active = ws
+        ws.append(["Line number", "Trace ID", "Thread ID", "CPU ID", "Timestamp", "Timestamp diff"])
+        font = Font(bold=True, size=14)
+        a1 = ws['A1']  # type: Cell
+        a1.font = font
+        b1 = ws['B1']  # type: Cell
+        b1.font = font
+        c1 = ws['C1']  # type: Cell
+        c1.font = font
+        d1 = ws['D1']  # type: Cell
+        d1.font = font
+        e1 = ws['E1']  # type: Cell
+        e1.font = font
+        f1 = ws['F1']  # type: Cell
+        f1.font = font
         trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
+        fn = 'output/'+trace_file_id+'/'+self.output_fn
+        self.wb.save(fn)
+        self.wb.close()
+
+        self.wb = load_workbook(fn)
+        ws = self.wb.active
         try:
             os.mkdir('output/'+trace_file_id)
         except OSError as exc:  # Python >2.5
@@ -116,7 +155,9 @@ class Trace(object):
         def update_bar(_):
             if self.cnt >= len(self.rows):
                 try:
-                    self.wb.save('output/'+trace_file_id+'/'+self.output_fn)
+                    self.adjust_col_width(ws)
+                    self.wb.save(fn)
+                    self.wb.close()
                 except FileNotFoundError:
                     pass
                 popup.open()
@@ -135,12 +176,6 @@ class Trace(object):
 
         self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
         Clock.max_iteration = 100
-
-        ws.append(["Line number", "Trace ID", "Thread ID", "CPU ID", "Timestamp", "Timestamp diff"])
-        ws.oddHeader.center.text = "fffffffffffffffffff"
-        ws.oddHeader.center.size = 14
-        ws.oddHeader.center.font = "Tahoma,Bold"
-        ws.oddHeader.center.color = "CC3366"
 
         self.update_bar_trigger()
 
