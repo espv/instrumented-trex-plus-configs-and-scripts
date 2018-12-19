@@ -21,6 +21,7 @@ from matplotlib import pyplot as plt
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import Cell
 from openpyxl.styles import Font
+from openpyxl.worksheet import Worksheet
 from openpyxl_templates import TemplatedWorkbook
 from openpyxl_templates.table_sheet import TableSheet
 from openpyxl_templates.table_sheet.columns import CharColumn, IntColumn
@@ -137,10 +138,7 @@ class Trace(object):
 
         trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
         fn = 'output/'+trace_file_id+'/'+self.output_fn
-        self.wb.save(fn)
-        self.wb.close()
 
-        self.wb = load_workbook(fn)
         try:
             os.mkdir('output/'+trace_file_id)
         except OSError as exc:  # Python >2.5
@@ -149,41 +147,52 @@ class Trace(object):
             else:
                 raise
 
+        try:
+            self.wb.save(fn)
+        except FileNotFoundError:
+            pass
+        self.wb.close()
+
+        self.wb = load_workbook(fn)
+
         self.cnt = 0
 
         def update_bar(_):
             if self.cnt >= len(self.rows):
                 try:
                     self.wb.save(fn)
-                    self.wb.close()
-
-                    self.wb = load_workbook(fn)
-                    ws = self.wb.active
-                    font = Font(bold=True, size=14)
-                    a1 = ws['A1']  # type: Cell
-                    a1.font = font
-                    a1.value = "Line number"
-                    b1 = ws['B1']  # type: Cell
-                    b1.font = font
-                    b1.value = "Trace ID"
-                    c1 = ws['C1']  # type: Cell
-                    c1.font = font
-                    c1.value = "Thread ID"
-                    d1 = ws['D1']  # type: Cell
-                    d1.font = font
-                    d1.value = "CPU ID"
-                    e1 = ws['E1']  # type: Cell
-                    e1.font = font
-                    e1.value = "Timestamp"
-                    f1 = ws['F1']  # type: Cell
-                    f1.font = font
-                    f1.value = "Timestamp diff"
-
-                    self.adjust_col_width(self.wb.active)
-                    self.wb.save(fn)
-                    self.wb.close()
                 except FileNotFoundError:
                     pass
+                self.wb.close()
+
+                self.wb = load_workbook(fn)  # type: Workbook
+                ws = self.wb.active  # type: Worksheet
+                font = Font(bold=True, size=14)
+                a1 = ws['A1']  # type: Cell
+                a1.font = font
+                a1.value = "Line number"
+                b1 = ws['B1']  # type: Cell
+                b1.font = font
+                b1.value = "Trace ID"
+                c1 = ws['C1']  # type: Cell
+                c1.font = font
+                c1.value = "Thread ID"
+                d1 = ws['D1']  # type: Cell
+                d1.font = font
+                d1.value = "CPU ID"
+                e1 = ws['E1']  # type: Cell
+                e1.font = font
+                e1.value = "Timestamp"
+                f1 = ws['F1']  # type: Cell
+                f1.font = font
+                f1.value = "Timestamp diff"
+
+                self.adjust_col_width(self.wb.active)
+                try:
+                    self.wb.save(fn)
+                except FileNotFoundError:
+                    pass
+                self.wb.close()
                 popup.open()
                 self.cnt = self.max
                 bl.add_widget(btn, 3)
@@ -205,6 +214,8 @@ class Trace(object):
 
     def as_plots(self):
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
+        if len(self.numpy_rows) == 0:
+            return
         print(self.numpy_rows)
         print("\n")
         tmp_grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
