@@ -106,18 +106,25 @@ class Trace(object):
                 thread_id = type_dict[thread_attr['type']](split_l[int(thread_attr['position'])])
                 timestamp_attr = self.traceAttrs['timestamp']
                 timestamp = type_dict[timestamp_attr['type']](split_l[int(timestamp_attr['position'])])
-            except ValueError:
+            except ValueError:  # Occurs if any of the casts fail
                 return -1
 
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
             try:
                 previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            except IndexError:
+            except IndexError:  # Occurs when previous_times is empty
                 return -1
             if trace_id == FIRST_trace_id:
                 previous_time = timestamp
             self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time))
-            previous_times.setdefault(str(trace_id), []).append(timestamp)
+
+            try:
+                numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
+            except KeyError:  # Occurs if trace_id from trace is not in the config file
+                return -1
+
+            for _ in range(numFollowing):
+                previous_times.setdefault(str(trace_id), []).append(timestamp)
 
     @staticmethod
     def adjust_col_width(ws):
