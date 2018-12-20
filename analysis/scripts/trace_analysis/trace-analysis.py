@@ -110,7 +110,10 @@ class Trace(object):
                 return -1
 
             previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
-            previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
+            try:
+                previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
+            except IndexError:
+                return -1
             if trace_id == FIRST_trace_id:
                 previous_time = timestamp
             self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time))
@@ -303,10 +306,12 @@ class Trace(object):
                 pass
 
 
-class TestApp(App):
+class TraceAnalysisApp(App):
+    icon = 'trace-analysis.png'
+    title = "Trace analysis"
 
     def __init__(self):
-        super(TestApp, self).__init__()
+        super(TraceAnalysisApp, self).__init__()
         content = Button(text='Success')
         self.popup = Popup(title='Analysis finished', content=content,
                            auto_dismiss=True)
@@ -458,4 +463,4 @@ class TestApp(App):
 
 
 if __name__ == '__main__':
-    TestApp().run()
+    TraceAnalysisApp().run()
