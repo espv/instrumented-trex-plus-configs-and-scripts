@@ -221,20 +221,24 @@ class Trace(object):
             return
         print(self.numpy_rows)
         print("\n")
-        tmp_grouped_by_trace_id = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
-        for r in tmp_grouped_by_trace_id:
+        grouped_by_trace_id = list(npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :]))
+        for r in grouped_by_trace_id:
             print(r, "\n")
-
-        grouped_by_trace_id = []
 
         def get_index_in_dag(event_type, dag):
             for i, (k, _) in enumerate(dag.items()):
                 if str(event_type) == k:
                     return i
             return -1
-        for group_tmp in tmp_grouped_by_trace_id:
-            group_tmp_index = get_index_in_dag(group_tmp[0][0], self.possible_trace_event_transitions)
-            grouped_by_trace_id.insert(group_tmp_index, group_tmp)
+
+        for _, _ in enumerate(grouped_by_trace_id):
+            for i, group_tmp in enumerate(grouped_by_trace_id):
+                group_tmp_index = get_index_in_dag(group_tmp[0][0], self.possible_trace_event_transitions)
+                if i == group_tmp_index:
+                    continue
+                tmp = grouped_by_trace_id[group_tmp_index]
+                grouped_by_trace_id[group_tmp_index] = group_tmp
+                grouped_by_trace_id[i] = tmp
 
         y_hist = []
         for group in grouped_by_trace_id:
