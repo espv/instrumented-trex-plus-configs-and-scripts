@@ -34,6 +34,52 @@
 
     ]
   },
+  "traceIDs": {
+    "1": {
+      "numFollowing": 1,
+      "transitions": ["50"]
+    },
+    "50": {
+      "numFollowing": 1,
+      "transitions": ["51"]
+    },
+    "51": {
+      "numFollowing": 4,
+      "transitions": ["5"]
+    },
+    "5": {
+      "numFollowing": 1,
+      "transitions": ["6"]
+    },
+    "6": {
+      "numFollowing": 1,
+      "transitions": ["7"]
+    },
+    "7": {
+      "numFollowing": 1,
+      "transitions": ["59"]
+    },
+    "59": {
+      "numFollowing": 1,
+      "transitions": ["58"]
+    },
+    "58": {
+      "numFollowing": 4,
+      "transitions": ["8"]
+    },
+    "8": {
+      "numFollowing": 1,
+      "transitions": ["12"]
+    },
+    "12": {
+      "numFollowing": 1,
+      "transitions": ["100"]
+    },
+    "100": {
+      "numFollowing": 0,
+      "transitions": []
+    }
+  },
   "traceIdsToCSEMEvents": {
     "0": {
       "id": "0",

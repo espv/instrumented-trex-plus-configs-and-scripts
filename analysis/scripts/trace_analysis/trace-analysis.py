@@ -76,13 +76,13 @@ class TraceEntry(object):
 
 
 class Trace(object):
-    def __init__(self, trace, output_fn, possible_trace_event_transitions, reverse_possible_trace_event_transitions, traceAttrs):
+    def __init__(self, trace, output_fn, trace_ids, reverse_possible_trace_event_transitions, traceAttrs):
         self.rows = []
         self.raw_rows = []
         self.trace = trace
         self.wb = None  #TraceWorkBook(write_only=True)
         self.output_fn = output_fn
-        self.possible_trace_event_transitions = possible_trace_event_transitions
+        self.trace_ids = trace_ids
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
         self.traceAttrs = traceAttrs
         self.numpy_rows = None
@@ -233,7 +233,7 @@ class Trace(object):
 
         for _, _ in enumerate(grouped_by_trace_id):
             for i, group_tmp in enumerate(grouped_by_trace_id):
-                group_tmp_index = get_index_in_dag(group_tmp[0][0], self.possible_trace_event_transitions)
+                group_tmp_index = get_index_in_dag(group_tmp[0][0], self.trace_ids)
                 if i == group_tmp_index:
                     continue
                 tmp = grouped_by_trace_id[group_tmp_index]
@@ -331,6 +331,7 @@ class TraceAnalysisApp(App):
         self.selected_trace_tb = None
         self.trace_file = None
         self.trace = None
+        self.trace_ids = {}
 
     def gen_plots(self, _):
         if self.trace is not None:
@@ -365,7 +366,7 @@ class TraceAnalysisApp(App):
         self.bl.add_widget(exit_btn)
 
         self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
-        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.possible_trace_event_transitions, self.reverse_possible_trace_event_transitions, self.traceAttrs)
+        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.trace_ids, self.reverse_possible_trace_event_transitions, self.traceAttrs)
 
         if self.trace.collect_data() == -1:
             self.bl.clear_widgets(self.bl.children)
@@ -439,9 +440,9 @@ class TraceAnalysisApp(App):
             json_data = trace_file.read()
 
             data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
-            self.possible_trace_event_transitions = data["possibleTransitions"]  # A trace Id can be followed by one or more trace Ids
-            for k, v in self.possible_trace_event_transitions.items():
-                for a in v:
+            self.trace_ids = data['traceIDs']
+            for k, v in self.trace_ids.items():
+                for a in v["transitions"]:
                     self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
             self.traceAttrs = data["traceAttributes"]
 
