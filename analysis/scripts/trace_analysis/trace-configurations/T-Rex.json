@@ -44,7 +44,7 @@
       "transitions": ["51"]
     },
     "51": {
-      "numFollowing": 4,
+      "numFollowing": 1,
       "transitions": ["5"]
     },
     "5": {
@@ -63,9 +63,13 @@
       "numFollowing": 1,
       "transitions": ["58"]
     },
+    "57": {
+      "numFollowing": 1,
+      "transitions": ["58"]
+    },
     "58": {
-      "numFollowing": 4,
-      "transitions": ["8"]
+      "numFollowing": 1,
+      "transitions": ["8", "1"]
     },
     "8": {
       "numFollowing": 1,

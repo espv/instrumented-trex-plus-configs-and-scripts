@@ -66,19 +66,19 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff):
+    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
         self.line_nr = line_nr
         self.trace_id = trace_id
         self.cpu_id = cpu_id
         self.thread_id = thread_id
         self.timestamp = timestamp
         self.cur_prev_time_diff = cur_prev_time_diff
+        self.previous_trace_id = previous_trace_id
 
 
 class Trace(object):
     def __init__(self, trace, output_fn, trace_ids, reverse_possible_trace_event_transitions, traceAttrs):
         self.rows = []
-        self.raw_rows = []
         self.trace = trace
         self.wb = None  #TraceWorkBook(write_only=True)
         self.output_fn = output_fn
@@ -113,10 +113,10 @@ class Trace(object):
             try:
                 previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
             except IndexError:  # Occurs when previous_times is empty
-                return -1
-            if trace_id == FIRST_trace_id:
                 previous_time = timestamp
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time))
+            if trace_id == FIRST_trace_id or line_nr == 0:
+                previous_time = timestamp
+            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
             try:
                 numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
@@ -223,34 +223,16 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
         print(self.numpy_rows)
         print("\n")
-        grouped_by_trace_id = list(npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :]))
-        for r in grouped_by_trace_id:
-            print(r, "\n")
-
-        def get_index_in_dag(event_type, dag):
-            for i, (k, _) in enumerate(dag.items()):
-                if str(event_type) == k:
-                    return i
-            return -1
-
-        for _, _ in enumerate(grouped_by_trace_id):
-            for i, group_tmp in enumerate(grouped_by_trace_id):
-                group_tmp_index = get_index_in_dag(group_tmp[0][0], self.trace_ids)
-                if i == group_tmp_index:
-                    continue
-                tmp = grouped_by_trace_id[group_tmp_index]
-                grouped_by_trace_id[group_tmp_index] = group_tmp
-                grouped_by_trace_id[i] = tmp
-
-        y_hist = []
-        for group in grouped_by_trace_id:
-            diffs = np.array([r[4] for r in group])
-            y_hist.append(diffs)
+        # First group by => to trace ID
+        for group in npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :]):
+            # Then group by from => trace ID
+            for g2 in npi.group_by(group[:, 5]).split(group[:, :]):
+                self.trace_ids[str(group[0][0])].setdefault("traced", []).append({"fromTraceId": g2[0][5], "data": g2})
 
         trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
         try:
@@ -260,10 +242,20 @@ class Trace(object):
                 pass
             else:
                 raise
-        y = [[g[i][4] for i in range(len(g))] for g in grouped_by_trace_id]
+
+        y = []
+        xticks = []
+        for trace_id, v in self.trace_ids.items():
+            for d in v["traced"]:
+                y.append([d["data"][i][4] for i in range(len(d["data"]))])
+                xticks.append(str(d["fromTraceId"])+"-"+trace_id)
+
+
+
+        #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
         fig, ax = plt.subplots()
-        x = np.arange(len(grouped_by_trace_id))
-        xticks = [g[0][0] for i, g in enumerate(grouped_by_trace_id) if len(g) > 0 and len(g[0]) > 0]
+        x = np.arange(len(xticks))
+        #xticks = [g["traced"][0][0] for _, g in self.trace_ids.items() if len(g["traced"]) > 0 and len(g["traced"][0]) > 0]
         plt.xticks(x, xticks)
         ax.plot(x, np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
         ax.plot(x, np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
@@ -285,36 +277,36 @@ class Trace(object):
 
         flattened_y = np.hstack(np.asarray([np.asarray(e) for e in y]).flatten())
         x = []
-        #xticks = []
         for i, e in enumerate(y):
             for _ in e:
                 x.append(i)
-                #xticks.append(grouped_by_trace_id[i][0][0])
 
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay")
-        #unique, index = np.unique(xticks, return_inverse=True)
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)
         fig.savefig('output/'+trace_file_id+'/scatter.png')
         plt.show()
 
-        for i, group in enumerate(y_hist[1:]):
-            try:
-                proc_stage = str(grouped_by_trace_id[i+1][0][0])
-                proc_stage = str(grouped_by_trace_id[i][0][0]) + "-" + proc_stage
-                plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
-                plt.xlabel("Processing delay")
-                plt.ylabel("Occurrences ratio")
-                sns_plot = sns.distplot(group)
-                plt.xlim([0, np.percentile(group, 99)])
-                fig = sns_plot.get_figure()
-                fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
-                plt.show()
-            except np.linalg.linalg.LinAlgError:
-                pass
+        for toTraceId, v in self.trace_ids.items():
+            for g2 in v["traced"]:
+                try:
+                    # Currently, we cannot tell which data stems from which transitions. We must do that
+                    #proc_stage = str(grouped_by_trace_id[i][0][0]) + "-" + str(grouped_by_trace_id[i+1][0][0])
+                    proc_stage = g2["fromTraceId"] + "-" + toTraceId
+                    plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
+                    plt.xlabel("Processing delay")
+                    plt.ylabel("Occurrences ratio")
+                    group = np.array([r[4] for r in g2["data"]])
+                    sns_plot = sns.distplot(group)
+                    plt.xlim([0, np.percentile(group, 99)])
+                    fig = sns_plot.get_figure()
+                    fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
+                    plt.show()
+                except:
+                    pass
 
 
 class TraceAnalysisApp(App):
