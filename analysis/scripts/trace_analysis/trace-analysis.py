@@ -270,7 +270,7 @@ class Trace(object):
         ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
         plt.title("Processing delay percentiles")
         plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay")
+        plt.ylabel("Processing delay (CPU cycles)")
         fig.savefig('output/'+trace_file_id+'/percentiles.png')
         plt.show()
         plt.cla()
@@ -283,7 +283,7 @@ class Trace(object):
 
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay")
+        plt.ylabel("Processing delay (CPU cycles)")
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)
@@ -293,11 +293,9 @@ class Trace(object):
         for toTraceId, v in self.trace_ids.items():
             for g2 in v["traced"]:
                 try:
-                    # Currently, we cannot tell which data stems from which transitions. We must do that
-                    #proc_stage = str(grouped_by_trace_id[i][0][0]) + "-" + str(grouped_by_trace_id[i+1][0][0])
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
-                    plt.xlabel("Processing delay")
+                    plt.xlabel("Processing delay (CPU cycles)")
                     plt.ylabel("Occurrences ratio")
                     group = np.array([r[4] for r in g2["data"]])
                     sns_plot = sns.distplot(group)
