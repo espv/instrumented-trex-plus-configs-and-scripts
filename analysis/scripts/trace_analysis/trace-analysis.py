@@ -100,6 +100,8 @@ class Trace(object):
                 # Depending on the configuration file, the trace event format might be different
                 trace_attr = self.traceAttrs['traceId']
                 trace_id = type_dict[trace_attr['type']](split_l[int(trace_attr['position'])])
+                if self.trace_ids.get(str(trace_id)) is None:
+                    continue
                 cpu_attr = self.traceAttrs['cpuId']
                 cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
                 thread_attr = self.traceAttrs['threadId']
@@ -109,19 +111,20 @@ class Trace(object):
             except ValueError:  # Occurs if any of the casts fail
                 return -1
 
-            previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id))
+            previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), 0)
             try:
                 previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
             except IndexError:  # Occurs when previous_times is empty
                 previous_time = timestamp
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
             try:
                 numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
             except KeyError:  # Occurs if trace_id from trace is not in the config file
                 return -1
+
+            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
             for _ in range(numFollowing):
                 previous_times.setdefault(str(trace_id), []).append(timestamp)
@@ -270,7 +273,7 @@ class Trace(object):
         #ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
         plt.title("Processing delay percentiles")
         plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay (CPU cycles)")
+        plt.ylabel("Processing delay (nanoseconds)")
         fig.savefig('output/'+trace_file_id+'/percentiles.png')
         plt.show()
         plt.cla()
@@ -283,7 +286,7 @@ class Trace(object):
 
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay (CPU cycles)")
+        plt.ylabel("Processing delay (nanoseconds)")
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)
@@ -295,15 +298,17 @@ class Trace(object):
                 try:
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
-                    plt.xlabel("Processing delay (CPU cycles)")
+                    plt.xlabel("Processing delay (nanoseconds)")
                     plt.ylabel("Occurrences ratio")
-                    group = np.array([r[4] for r in g2["data"]])
-                    sns_plot = sns.distplot(group)
-                    plt.xlim([0, np.percentile(group, 99)])
+                    group = np.array([int(r[4]) for r in g2["data"]])
+                    #sns_plot = sns.distplot(group)
+                    sns_plot = sns.distplot(group, kde=False, norm_hist=False)
+                    #plt.xlim([0, np.percentile(group, 99)])
+                    #plt.ylim([0, 0.00001])
                     fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
                     plt.show()
-                except:
+                except np.linalg.LinAlgError:
                     pass
 
 
