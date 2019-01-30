@@ -18,10 +18,6 @@
     },
     "5": {
       "numFollowing": 1,
-      "transitions": ["8"]
-    },
-    "8": {
-      "numFollowing": 1,
       "transitions": ["6"]
     },
     "6": {
