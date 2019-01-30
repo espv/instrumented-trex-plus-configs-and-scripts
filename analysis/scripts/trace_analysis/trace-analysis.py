@@ -246,7 +246,7 @@ class Trace(object):
         y = []
         xticks = []
         for trace_id, v in self.trace_ids.items():
-            for d in v["traced"]:
+            for d in v.get("traced", []):
                 y.append([d["data"][i][4] for i in range(len(d["data"]))])
                 xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
