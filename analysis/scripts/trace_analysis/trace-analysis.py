@@ -230,7 +230,7 @@ class Trace(object):
         print("\n")
         # First group by => to trace ID
         for group in npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :]):
-            # Then group by from => trace ID
+            # Then group by => from trace ID
             for g2 in npi.group_by(group[:, 5]).split(group[:, :]):
                 self.trace_ids[str(group[0][0])].setdefault("traced", []).append({"fromTraceId": g2[0][5], "data": g2})
 
@@ -246,8 +246,8 @@ class Trace(object):
         y = []
         xticks = []
         for trace_id, v in self.trace_ids.items():
-            for d in v["traced"]:
-                y.append([d["data"][i][4] for i in range(len(d["data"]))])
+            for d in v.get("traced", []):
+                y.append([int(d["data"][i][4]) for i in range(len(d["data"]))])
                 xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
 
@@ -267,7 +267,7 @@ class Trace(object):
         ax.plot(x, np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
         ax.plot(x, np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
         ax.plot(x, np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
-        ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
+        #ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
         plt.title("Processing delay percentiles")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (CPU cycles)")
@@ -291,7 +291,7 @@ class Trace(object):
         plt.show()
 
         for toTraceId, v in self.trace_ids.items():
-            for g2 in v["traced"]:
+            for g2 in v.get("traced", []):
                 try:
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
