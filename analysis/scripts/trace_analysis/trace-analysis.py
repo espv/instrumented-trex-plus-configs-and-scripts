@@ -90,7 +90,23 @@ class Trace(object):
         self.numpy_rows = None
         self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
-    
+
+    def get_previous_event(self, this_trace_id, previous_times):
+        potential_previous_tuples = OrderedDict()
+        for prev in self.reverse_possible_trace_event_transitions.get(this_trace_id, [0]):
+            if len(previous_times.get(prev, [0])) > 0:
+                time = previous_times.get(prev, [0])[0]
+                potential_previous_tuples[time] = prev
+
+        best_match = ()
+        for i, (k, v) in enumerate(potential_previous_tuples.items()):
+            best_match = str(v), k
+            if k != 0:
+                previous_times[v].pop()
+                break
+
+        return best_match
+
     def collect_data(self):
         previous_times = {}
         for line_nr, l in enumerate(self.trace):
@@ -113,11 +129,10 @@ class Trace(object):
             except ValueError:  # Occurs if any of the casts fail
                 return -1
 
-            previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), 0)
-            try:
-                previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            except IndexError:  # Occurs when previous_times is empty
-                previous_time = timestamp
+            #previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), [0])[0]
+            #previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
+            previous_trace_id, previous_time = self.get_previous_event(str(trace_id), previous_times)
+
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
 
@@ -450,7 +465,7 @@ class TraceAnalysisApp(App):
             self.trace_ids = data['traceIDs']
             for k, v in self.trace_ids.items():
                 for a in v["transitions"]:
-                    self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
+                    self.reverse_possible_trace_event_transitions.setdefault(a, []).append(k) # Assume that a given trace Id can only be preceeded by one trace Id
             self.traceAttrs = data["traceAttributes"]
 
         return self.clear_and_select_trace(None)
