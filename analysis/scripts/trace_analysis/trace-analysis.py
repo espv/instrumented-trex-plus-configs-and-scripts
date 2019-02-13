@@ -11,11 +11,13 @@ import numpy_indexed as npi
 import seaborn as sns
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.togglebutton import ToggleButton
 from matplotlib import pyplot as plt
 from openpyxl import Workbook, load_workbook
@@ -303,7 +305,7 @@ class Trace(object):
                     group = np.array([int(r[4]) for r in g2["data"]])
                     #sns_plot = sns.distplot(group)
                     sns_plot = sns.distplot(group, kde=False, norm_hist=False)
-                    #plt.xlim([0, np.percentile(group, 99)])
+                    plt.xlim([0, np.percentile(group, 99)])
                     #plt.ylim([0, 0.00001])
                     fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
@@ -318,14 +320,17 @@ class TraceAnalysisApp(App):
 
     def __init__(self):
         super(TraceAnalysisApp, self).__init__()
-        content = Button(text='Success')
+        content = Button(text='Success', size_hint_y=None, height=30)
         self.popup = Popup(title='Analysis finished', content=content,
-                           auto_dismiss=True)
+                           auto_dismiss=True, size_hint_y=None, height=30)
         content.bind(on_press=self.popup.dismiss)
-        error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.')
+        error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.', size_hint_y=None, height=30)
         self.error_in_trace_popup = Popup(title='Error', content=error_content)
         error_content.bind(on_press=self.error_in_trace_popup.dismiss)
-        self.bl = BoxLayout(orientation='vertical')
+        self.bl = GridLayout(cols=1, size_hint_y=None)
+        self.bl.bind(minimum_height=self.bl.setter('height'))
+        self.root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
+        self.root.add_widget(self.bl)
         self.possible_trace_event_transitions = {}
         self.reverse_possible_trace_event_transitions = {}
         self.traceAttrs = {}
@@ -342,7 +347,7 @@ class TraceAnalysisApp(App):
 
     def gen_xlsx(self, btn: Button):
         if self.trace is not None:
-            pb = ProgressBar(max=len(self.trace.rows)*2, value=0)
+            pb = ProgressBar(max=len(self.trace.rows)*2, value=0, size_hint_y=None, height=30)
             self.bl.clear_widgets([btn])
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
@@ -350,20 +355,20 @@ class TraceAnalysisApp(App):
     def parse_trace_file(self):
         self.bl.clear_widgets(self.bl.children)
 
-        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text))
-        gen_plots_btn = Button(text="Analyze data and generate plots")
+        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text, size_hint_y=None, height=30))
+        gen_plots_btn = Button(text="Analyze data and generate plots", size_hint_y=None, height=30)
         gen_plots_btn.bind(on_press=self.gen_plots)
         self.bl.add_widget(gen_plots_btn)
-        gen_xlsx_btn = Button(text="Analyze data and export to excel")
+        gen_xlsx_btn = Button(text="Analyze data and export to excel", size_hint_y=None, height=30)
         gen_xlsx_btn.bind(on_press=self.gen_xlsx)
         self.bl.add_widget(gen_xlsx_btn)
-        decomp_trace_btn = Button(text="Decompress trace")
+        decomp_trace_btn = Button(text="Decompress trace", size_hint_y=None, height=30)
         decomp_trace_btn.bind(on_press=self.decompress_trace)
         self.bl.add_widget(decomp_trace_btn)
-        back_btn = Button(text="Back")
+        back_btn = Button(text="Back", size_hint_y=None, height=30)
         back_btn.bind(on_press=self.clear_and_select_trace)
         self.bl.add_widget(back_btn)
-        exit_btn = Button(text="Exit")
+        exit_btn = Button(text="Exit", size_hint_y=None, height=30)
         exit_btn.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(exit_btn)
 
@@ -410,18 +415,18 @@ class TraceAnalysisApp(App):
         self.popup.open()
 
     def select_trace_to_analyze(self):
-        self.bl.add_widget(Label(text='Select trace file to analyze'))
+        self.bl.add_widget(Label(text='Select trace file to analyze', size_hint_y=None, height=30))
         path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
         path_list.sort(key=lambda s: s[0])
         for i, (time, fn) in enumerate(path_list):
             if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down'))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down', size_hint_y=None, height=30))
             else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file"))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file", size_hint_y=None, height=30))
 
-        select_button = Button(text="Select")
+        select_button = Button(text="Select", size_hint_y=None, height=30)
         select_button.bind(on_press=self.select_trace_file)
-        exit_button = Button(text="Exit")
+        exit_button = Button(text="Exit", size_hint_y=None, height=30)
         exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(select_button)
         self.bl.add_widget(exit_button)
@@ -451,22 +456,22 @@ class TraceAnalysisApp(App):
         return self.clear_and_select_trace(None)
 
     def build(self):
-        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
+        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events', size_hint_y=None, height=30))
         path_list = [(os.stat('trace-configurations/'+p.name).st_mtime, p.name) for p in Path('trace-configurations/').glob('**/*.json')]
         path_list.sort(key=lambda s: s[0])
         for i, (time, fn) in enumerate(path_list):
             if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down'))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down', size_hint_y=None, height=30))
             else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file"))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", size_hint_y=None, height=30))
 
-        select_button = Button(text="Select")
+        select_button = Button(text="Select", size_hint_y=None, height=30)
         select_button.bind(on_press=self.selected_traceid_to_csem_events_map_file)
         self.bl.add_widget(select_button)
-        exit_button = Button(text="Exit")
+        exit_button = Button(text="Exit", size_hint_y=None, height=30)
         exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(exit_button)
-        return self.bl
+        return self.root
 
 
 if __name__ == '__main__':
