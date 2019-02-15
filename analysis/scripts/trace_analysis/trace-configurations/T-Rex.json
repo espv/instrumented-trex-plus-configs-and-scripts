@@ -49,10 +49,6 @@
       "transitions": ["100"]
     },
     "100": {
-      "numFollowing": 1,
-      "transitions": ["155"]
-    },
-    "155": {
       "numFollowing": 0,
       "transitions": []
     }

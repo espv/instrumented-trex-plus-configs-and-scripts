@@ -91,14 +91,14 @@ class Trace(object):
         self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
 
-    def get_previous_event(self, this_trace_id, previous_times):
+    def get_previous_event(self, this_trace_id, this_timestamp, previous_times):
         potential_previous_tuples = OrderedDict()
         for prev in self.reverse_possible_trace_event_transitions.get(this_trace_id, [0]):
             if len(previous_times.get(prev, [0])) > 0:
                 time = previous_times.get(prev, [0])[0]
                 potential_previous_tuples[time] = prev
 
-        best_match = ()
+        best_match = (0, this_timestamp)
         for i, (k, v) in enumerate(potential_previous_tuples.items()):
             best_match = str(v), k
             if k != 0:
@@ -131,7 +131,7 @@ class Trace(object):
 
             #previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), [0])[0]
             #previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            previous_trace_id, previous_time = self.get_previous_event(str(trace_id), previous_times)
+            previous_trace_id, previous_time = self.get_previous_event(str(trace_id), timestamp, previous_times)
 
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
@@ -271,9 +271,8 @@ class Trace(object):
                 xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
 
-
         #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(15,5))
         x = np.arange(len(xticks))
         #xticks = [g["traced"][0][0] for _, g in self.trace_ids.items() if len(g["traced"]) > 0 and len(g["traced"][0]) > 0]
         plt.xticks(x, xticks)
