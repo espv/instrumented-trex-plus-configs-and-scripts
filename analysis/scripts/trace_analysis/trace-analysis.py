@@ -136,10 +136,10 @@ class Trace(object):
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
 
-            try:
-                numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
-            except KeyError:  # Occurs if trace_id from trace is not in the config file
-                return -1
+            #try:
+            numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
+            #except KeyError:  # Occurs if trace_id from trace is not in the config file
+            #    return -1
 
             self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
@@ -303,6 +303,7 @@ class Trace(object):
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
+        plt.figure(figsize=(15, 5))
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)
