@@ -30,15 +30,7 @@
     },
     "59": {
       "numFollowing": 1,
-      "transitions": ["58", "111"]
-    },
-    "57": {
-      "numFollowing": 1,
-      "transitions": ["58"]
-    },
-    "58": {
-      "numFollowing": 1,
-      "transitions": ["111", "1"]
+      "transitions": ["111"]
     },
     "111": {
       "numFollowing": 1,
@@ -70,16 +62,20 @@
       "position": 0,
       "type": "integer"
     },
-    "cpuId": {
+    "eventType": {
       "position": 1,
       "type": "integer"
     },
-    "threadId": {
+    "cpuId": {
       "position": 2,
       "type": "integer"
     },
-    "timestamp": {
+    "threadId": {
       "position": 3,
+      "type": "integer"
+    },
+    "timestamp": {
+      "position": 4,
       "type": "integer"
     }
   }

@@ -68,9 +68,10 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
+    def __init__(self, line_nr, trace_id, event_type, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
         self.line_nr = line_nr
         self.trace_id = trace_id
+        self.event_type = event_type
         self.cpu_id = cpu_id
         self.thread_id = thread_id
         self.timestamp = timestamp
@@ -98,7 +99,7 @@ class Trace(object):
                 time = previous_times.get(prev, [0])[0]
                 potential_previous_tuples[time] = prev
 
-        best_match = (0, this_timestamp)
+        best_match = ("", this_timestamp)
         for i, (k, v) in enumerate(potential_previous_tuples.items()):
             best_match = str(v), k
             if k != 0:
@@ -120,6 +121,8 @@ class Trace(object):
                 trace_id = type_dict[trace_attr['type']](split_l[int(trace_attr['position'])])
                 if self.trace_ids.get(str(trace_id)) is None:
                     continue
+                event_type_attr = self.traceAttrs['eventType']
+                event_type = type_dict[event_type_attr['type']](split_l[int(event_type_attr['position'])])
                 cpu_attr = self.traceAttrs['cpuId']
                 cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
                 thread_attr = self.traceAttrs['threadId']
@@ -141,7 +144,7 @@ class Trace(object):
             #except KeyError:  # Occurs if trace_id from trace is not in the config file
             #    return -1
 
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
+            self.rows.append(TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
             for _ in range(numFollowing):
                 previous_times.setdefault(str(trace_id), []).append(timestamp)
@@ -234,7 +237,7 @@ class Trace(object):
             pb.value = self.cnt
             te = self.rows[self.cnt]
             self.cnt += 1
-            row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
+            row = [te.line_nr, te.trace_id, te.event_type, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
             self.wb.active.append(row)
 
         self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
@@ -243,7 +246,7 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id, te.event_type] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
         print(self.numpy_rows)
@@ -267,8 +270,10 @@ class Trace(object):
         xticks = []
         for trace_id, v in self.trace_ids.items():
             for d in v.get("traced", []):
-                y.append([int(d["data"][i][4]) for i in range(len(d["data"]))])
-                xticks.append(str(d["fromTraceId"])+"-"+trace_id)
+                e = [int(d["data"][i][4]) for i in range(len(d["data"])) if d["data"][i][6] != '1']
+                if len(e) > 0:
+                    y.append(e)
+                    xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
 
         #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
@@ -313,13 +318,16 @@ class Trace(object):
         for toTraceId, v in self.trace_ids.items():
             for g2 in v.get("traced", []):
                 try:
+                    if g2["fromTraceId"] == "":
+                        continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
                     plt.xlabel("Processing delay (nanoseconds)")
                     plt.ylabel("Occurrences ratio")
                     group = np.array([int(r[4]) for r in g2["data"]])
-                    #sns_plot = sns.distplot(group)
-                    sns_plot = sns.distplot(group, kde=False, norm_hist=False)
+                    print(group)
+                    sns_plot = sns.distplot(group)
+                    #sns_plot = sns.distplot(group, kde=False, norm_hist=False)
                     plt.xlim([0, np.percentile(group, 99)])
                     #plt.ylim([0, 0.00001])
                     fig = sns_plot.get_figure()
