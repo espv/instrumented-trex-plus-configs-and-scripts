@@ -6,7 +6,27 @@
     },
     "50": {
       "numFollowing": 1,
-      "transitions": ["51"]
+      "transitions": ["501", "502", "503", "504", "505", "51"]
+    },
+    "501": {
+      "numFollowing": 1,
+      "transitions": ["501", "502", "503", "504", "505", "51"]
+    },
+    "502": {
+      "numFollowing": 1,
+      "transitions": ["502", "503", "504", "505", "51"]
+    },
+    "503": {
+      "numFollowing": 1,
+      "transitions": ["503", "504", "505", "51"]
+    },
+    "504": {
+      "numFollowing": 1,
+      "transitions": ["504", "505", "51"]
+    },
+    "505": {
+      "numFollowing": 1,
+      "transitions": ["505", "51"]
     },
     "51": {
       "numFollowing": 1,
