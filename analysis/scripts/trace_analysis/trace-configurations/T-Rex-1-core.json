@@ -1,0 +1,82 @@
+{
+  "traceIDs": {
+    "1": {
+      "numFollowing": 1,
+      "transitions": ["50"]
+    },
+    "50": {
+      "numFollowing": 1,
+      "transitions": ["51"]
+    },
+    "51": {
+      "numFollowing": 1,
+      "transitions": ["110"]
+    },
+    "110": {
+      "numFollowing": 1,
+      "transitions": ["5"]
+    },
+    "5": {
+      "numFollowing": 1,
+      "transitions": ["6"]
+    },
+    "6": {
+      "numFollowing": 1,
+      "transitions": ["7"]
+    },
+    "7": {
+      "numFollowing": 1,
+      "transitions": ["59", "7"]
+    },
+    "59": {
+      "numFollowing": 1,
+      "transitions": ["111"]
+    },
+    "111": {
+      "numFollowing": 1,
+      "transitions": ["12", "57"]
+    },
+    "12": {
+      "numFollowing": 1,
+      "transitions": ["100"]
+    },
+    "100": {
+      "numFollowing": 0,
+      "transitions": []
+    }
+  },
+  "traceIdsToCSEMEvents": {
+    "0": {
+      "id": "0",
+      "csemEvents": "HIRQENTRY 0 1 [CPU_CYCLES] 1 0 0 interruptfifop_fired s\n",
+      "description": "Hardware interrupt entry event for HIRQ-1"
+    },
+    "1": {
+      "id": "1",
+      "csemEvents": "TEMPSYNCH 0 1 [CPU_CYCLES] 1 0 1 (TEMP) readDoneLength\n",
+      "description": ""
+    }
+  },
+  "traceAttributes": {
+    "traceId": {
+      "position": 0,
+      "type": "integer"
+    },
+    "eventType": {
+      "position": 1,
+      "type": "integer"
+    },
+    "cpuId": {
+      "position": 2,
+      "type": "integer"
+    },
+    "threadId": {
+      "position": 3,
+      "type": "integer"
+    },
+    "timestamp": {
+      "position": 4,
+      "type": "integer"
+    }
+  }
+}

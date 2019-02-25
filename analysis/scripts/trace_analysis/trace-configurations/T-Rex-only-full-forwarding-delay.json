@@ -2,7 +2,11 @@
   "traceIDs": {
     "1": {
       "numFollowing": 1,
-      "transitions": ["100"]
+      "transitions": ["230","100"]
+    },
+    "230": {
+      "numFollowing": 1,
+      "transitions": ["100", "230"]
     },
     "100": {
       "numFollowing": 0,
@@ -26,16 +30,20 @@
       "position": 0,
       "type": "integer"
     },
-    "cpuId": {
+    "eventType": {
       "position": 1,
       "type": "integer"
     },
-    "threadId": {
+    "cpuId": {
       "position": 2,
       "type": "integer"
     },
-    "timestamp": {
+    "threadId": {
       "position": 3,
+      "type": "integer"
+    },
+    "timestamp": {
+      "position": 4,
       "type": "integer"
     }
   }

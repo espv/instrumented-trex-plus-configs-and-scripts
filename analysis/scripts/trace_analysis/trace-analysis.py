@@ -11,11 +11,13 @@ import numpy_indexed as npi
 import seaborn as sns
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.uix.boxlayout import BoxLayout
+from kivy.core.window import Window
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
+from kivy.uix.scrollview import ScrollView
 from kivy.uix.togglebutton import ToggleButton
 from matplotlib import pyplot as plt
 from openpyxl import Workbook, load_workbook
@@ -66,9 +68,10 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, line_nr, trace_id, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
+    def __init__(self, line_nr, trace_id, event_type, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
         self.line_nr = line_nr
         self.trace_id = trace_id
+        self.event_type = event_type
         self.cpu_id = cpu_id
         self.thread_id = thread_id
         self.timestamp = timestamp
@@ -88,7 +91,23 @@ class Trace(object):
         self.numpy_rows = None
         self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
-    
+
+    def get_previous_event(self, this_trace_id, this_timestamp, previous_times):
+        potential_previous_tuples = OrderedDict()
+        for prev in self.reverse_possible_trace_event_transitions.get(this_trace_id, [0]):
+            if len(previous_times.get(prev, [0])) > 0:
+                time = previous_times.get(prev, [0])[0]
+                potential_previous_tuples[time] = prev
+
+        best_match = ("", this_timestamp)
+        for i, (k, v) in enumerate(potential_previous_tuples.items()):
+            best_match = str(v), k
+            if k != 0:
+                previous_times[v].pop()
+                break
+
+        return best_match
+
     def collect_data(self):
         previous_times = {}
         for line_nr, l in enumerate(self.trace):
@@ -102,6 +121,8 @@ class Trace(object):
                 trace_id = type_dict[trace_attr['type']](split_l[int(trace_attr['position'])])
                 if self.trace_ids.get(str(trace_id)) is None:
                     continue
+                event_type_attr = self.traceAttrs['eventType']
+                event_type = type_dict[event_type_attr['type']](split_l[int(event_type_attr['position'])])
                 cpu_attr = self.traceAttrs['cpuId']
                 cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
                 thread_attr = self.traceAttrs['threadId']
@@ -111,20 +132,19 @@ class Trace(object):
             except ValueError:  # Occurs if any of the casts fail
                 return -1
 
-            previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), 0)
-            try:
-                previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            except IndexError:  # Occurs when previous_times is empty
-                previous_time = timestamp
+            #previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), [0])[0]
+            #previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
+            previous_trace_id, previous_time = self.get_previous_event(str(trace_id), timestamp, previous_times)
+
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
 
-            try:
-                numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
-            except KeyError:  # Occurs if trace_id from trace is not in the config file
-                return -1
+            #try:
+            numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
+            #except KeyError:  # Occurs if trace_id from trace is not in the config file
+            #    return -1
 
-            self.rows.append(TraceEntry(line_nr, trace_id, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
+            self.rows.append(TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
 
             for _ in range(numFollowing):
                 previous_times.setdefault(str(trace_id), []).append(timestamp)
@@ -217,7 +237,7 @@ class Trace(object):
             pb.value = self.cnt
             te = self.rows[self.cnt]
             self.cnt += 1
-            row = [te.line_nr, te.trace_id, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
+            row = [te.line_nr, te.trace_id, te.event_type, te.thread_id,  te.cpu_id, te.timestamp, te.cur_prev_time_diff]
             self.wb.active.append(row)
 
         self.update_bar_trigger = Clock.create_trigger(update_bar, -1)
@@ -226,7 +246,7 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id, te.event_type] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
         print(self.numpy_rows)
@@ -250,13 +270,14 @@ class Trace(object):
         xticks = []
         for trace_id, v in self.trace_ids.items():
             for d in v.get("traced", []):
-                y.append([int(d["data"][i][4]) for i in range(len(d["data"]))])
-                xticks.append(str(d["fromTraceId"])+"-"+trace_id)
-
+                e = [int(d["data"][i][4]) for i in range(len(d["data"])) if d["data"][i][6] != '1']
+                if len(e) > 0:
+                    y.append(e)
+                    xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
 
         #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(15,5))
         x = np.arange(len(xticks))
         #xticks = [g["traced"][0][0] for _, g in self.trace_ids.items() if len(g["traced"]) > 0 and len(g["traced"][0]) > 0]
         plt.xticks(x, xticks)
@@ -287,6 +308,7 @@ class Trace(object):
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
+        plt.figure(figsize=(15, 5))
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)
@@ -296,6 +318,8 @@ class Trace(object):
         for toTraceId, v in self.trace_ids.items():
             for g2 in v.get("traced", []):
                 try:
+                    if g2["fromTraceId"] == "":
+                        continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
                     plt.xlabel("Processing delay (nanoseconds)")
@@ -303,7 +327,7 @@ class Trace(object):
                     group = np.array([int(r[4]) for r in g2["data"]])
                     #sns_plot = sns.distplot(group)
                     sns_plot = sns.distplot(group, kde=False, norm_hist=False)
-                    #plt.xlim([0, np.percentile(group, 99)])
+                    plt.xlim([0, np.percentile(group, 99)])
                     #plt.ylim([0, 0.00001])
                     fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
@@ -318,14 +342,17 @@ class TraceAnalysisApp(App):
 
     def __init__(self):
         super(TraceAnalysisApp, self).__init__()
-        content = Button(text='Success')
+        content = Button(text='Success', size_hint_y=None, height=30)
         self.popup = Popup(title='Analysis finished', content=content,
-                           auto_dismiss=True)
+                           auto_dismiss=True, size_hint_y=None, height=30)
         content.bind(on_press=self.popup.dismiss)
-        error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.')
+        error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.', size_hint_y=None, height=30)
         self.error_in_trace_popup = Popup(title='Error', content=error_content)
         error_content.bind(on_press=self.error_in_trace_popup.dismiss)
-        self.bl = BoxLayout(orientation='vertical')
+        self.bl = GridLayout(cols=1, size_hint_y=None)
+        self.bl.bind(minimum_height=self.bl.setter('height'))
+        self.root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
+        self.root.add_widget(self.bl)
         self.possible_trace_event_transitions = {}
         self.reverse_possible_trace_event_transitions = {}
         self.traceAttrs = {}
@@ -342,7 +369,7 @@ class TraceAnalysisApp(App):
 
     def gen_xlsx(self, btn: Button):
         if self.trace is not None:
-            pb = ProgressBar(max=len(self.trace.rows)*2, value=0)
+            pb = ProgressBar(max=len(self.trace.rows)*2, value=0, size_hint_y=None, height=30)
             self.bl.clear_widgets([btn])
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
@@ -350,20 +377,20 @@ class TraceAnalysisApp(App):
     def parse_trace_file(self):
         self.bl.clear_widgets(self.bl.children)
 
-        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text))
-        gen_plots_btn = Button(text="Analyze data and generate plots")
+        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text, size_hint_y=None, height=30))
+        gen_plots_btn = Button(text="Analyze data and generate plots", size_hint_y=None, height=30)
         gen_plots_btn.bind(on_press=self.gen_plots)
         self.bl.add_widget(gen_plots_btn)
-        gen_xlsx_btn = Button(text="Analyze data and export to excel")
+        gen_xlsx_btn = Button(text="Analyze data and export to excel", size_hint_y=None, height=30)
         gen_xlsx_btn.bind(on_press=self.gen_xlsx)
         self.bl.add_widget(gen_xlsx_btn)
-        decomp_trace_btn = Button(text="Decompress trace")
+        decomp_trace_btn = Button(text="Decompress trace", size_hint_y=None, height=30)
         decomp_trace_btn.bind(on_press=self.decompress_trace)
         self.bl.add_widget(decomp_trace_btn)
-        back_btn = Button(text="Back")
+        back_btn = Button(text="Back", size_hint_y=None, height=30)
         back_btn.bind(on_press=self.clear_and_select_trace)
         self.bl.add_widget(back_btn)
-        exit_btn = Button(text="Exit")
+        exit_btn = Button(text="Exit", size_hint_y=None, height=30)
         exit_btn.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(exit_btn)
 
@@ -410,18 +437,18 @@ class TraceAnalysisApp(App):
         self.popup.open()
 
     def select_trace_to_analyze(self):
-        self.bl.add_widget(Label(text='Select trace file to analyze'))
+        self.bl.add_widget(Label(text='Select trace file to analyze', size_hint_y=None, height=30))
         path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
         path_list.sort(key=lambda s: s[0])
         for i, (time, fn) in enumerate(path_list):
             if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down'))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down', size_hint_y=None, height=30))
             else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file"))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file", size_hint_y=None, height=30))
 
-        select_button = Button(text="Select")
+        select_button = Button(text="Select", size_hint_y=None, height=30)
         select_button.bind(on_press=self.select_trace_file)
-        exit_button = Button(text="Exit")
+        exit_button = Button(text="Exit", size_hint_y=None, height=30)
         exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(select_button)
         self.bl.add_widget(exit_button)
@@ -445,28 +472,28 @@ class TraceAnalysisApp(App):
             self.trace_ids = data['traceIDs']
             for k, v in self.trace_ids.items():
                 for a in v["transitions"]:
-                    self.reverse_possible_trace_event_transitions[a] = k  # Assume that a given trace Id can only be preceeded by one trace Id
+                    self.reverse_possible_trace_event_transitions.setdefault(a, []).append(k) # Assume that a given trace Id can only be preceeded by one trace Id
             self.traceAttrs = data["traceAttributes"]
 
         return self.clear_and_select_trace(None)
 
     def build(self):
-        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events'))
+        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events', size_hint_y=None, height=30))
         path_list = [(os.stat('trace-configurations/'+p.name).st_mtime, p.name) for p in Path('trace-configurations/').glob('**/*.json')]
         path_list.sort(key=lambda s: s[0])
         for i, (time, fn) in enumerate(path_list):
             if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down'))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down', size_hint_y=None, height=30))
             else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file"))
+                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", size_hint_y=None, height=30))
 
-        select_button = Button(text="Select")
+        select_button = Button(text="Select", size_hint_y=None, height=30)
         select_button.bind(on_press=self.selected_traceid_to_csem_events_map_file)
         self.bl.add_widget(select_button)
-        exit_button = Button(text="Exit")
+        exit_button = Button(text="Exit", size_hint_y=None, height=30)
         exit_button.bind(on_press=lambda _: exit(0))
         self.bl.add_widget(exit_button)
-        return self.bl
+        return self.root
 
 
 if __name__ == '__main__':
