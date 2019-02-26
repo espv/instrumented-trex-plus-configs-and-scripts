@@ -277,7 +277,7 @@ class Trace(object):
 
 
         #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
-        fig, ax = plt.subplots(figsize=(15,5))
+        fig, ax = plt.subplots(figsize=(20,5))
         x = np.arange(len(xticks))
         #xticks = [g["traced"][0][0] for _, g in self.trace_ids.items() if len(g["traced"]) > 0 and len(g["traced"][0]) > 0]
         plt.xticks(x, xticks)
@@ -308,7 +308,7 @@ class Trace(object):
         plt.title("Processing delay scatter plot")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
-        plt.figure(figsize=(15, 5))
+        plt.figure(figsize=(20, 5))
         fig = plt.scatter(x, flattened_y).get_figure()
 
         plt.xticks(range(len(xticks)), xticks)

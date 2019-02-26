@@ -2,7 +2,11 @@
   "traceIDs": {
     "1": {
       "numFollowing": 1,
-      "transitions": ["100"]
+      "transitions": ["230","100"]
+    },
+    "230": {
+      "numFollowing": 1,
+      "transitions": ["100", "230"]
     },
     "100": {
       "numFollowing": 0,
