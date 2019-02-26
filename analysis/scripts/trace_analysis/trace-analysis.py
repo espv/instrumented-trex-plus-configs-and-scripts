@@ -83,7 +83,7 @@ class Trace(object):
     def __init__(self, trace, output_fn, trace_ids, reverse_possible_trace_event_transitions, traceAttrs):
         self.rows = []
         self.trace = trace
-        self.wb = None  #TraceWorkBook(write_only=True)
+        self.wb = None
         self.output_fn = output_fn
         self.trace_ids = trace_ids
         self.reverse_possible_trace_event_transitions = reverse_possible_trace_event_transitions
@@ -92,24 +92,28 @@ class Trace(object):
         self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
 
-    def get_previous_event(self, this_trace_id, this_timestamp, previous_times):
-        potential_previous_tuples = OrderedDict()
-        for prev in self.reverse_possible_trace_event_transitions.get(this_trace_id, [0]):
-            if len(previous_times.get(prev, [0])) > 0:
-                time = previous_times.get(prev, [0])[0]
-                potential_previous_tuples[time] = prev
+    def get_previous_event(self, this_row, previous_rows):
+        if len(previous_rows) == 0:
+            return "", this_row.timestamp
 
-        best_match = ("", this_timestamp)
-        for i, (k, v) in enumerate(potential_previous_tuples.items()):
-            best_match = str(v), k
-            if k != 0:
-                previous_times[v].pop()
-                break
+        if this_row.event_type == 2:
+            for prev in self.reverse_possible_trace_event_transitions.get(this_row.trace_id):
+                for i, row in enumerate(reversed(previous_rows)):
+                    if row.trace_id == prev:
+                        #index = -(i+1)
+                        #del previous_rows[index]
+                        return row.trace_id, row.timestamp
+        else:
+            for i, row in enumerate(previous_rows):
+                if (row.event_type == 0 or row.event_type == 2) and row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
+                    previous_row = row
+                    del previous_rows[i]
+                    return str(previous_row.trace_id), previous_row.timestamp
 
-        return best_match
+        return "", this_row.timestamp
 
     def collect_data(self):
-        previous_times = {}
+        previous_times = []
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
             if len(split_l) < len(self.traceAttrs):
@@ -118,11 +122,11 @@ class Trace(object):
             try:
                 # Depending on the configuration file, the trace event format might be different
                 trace_attr = self.traceAttrs['traceId']
-                trace_id = type_dict[trace_attr['type']](split_l[int(trace_attr['position'])])
-                if self.trace_ids.get(str(trace_id)) is None:
+                trace_id = str(type_dict[trace_attr['type']](split_l[int(trace_attr['position'])]))
+                if self.trace_ids.get(trace_id) is None:
                     continue
-                event_type_attr = self.traceAttrs['eventType']
-                event_type = type_dict[event_type_attr['type']](split_l[int(event_type_attr['position'])])
+                #event_type_attr = self.traceAttrs['eventType']
+                #event_type = type_dict[event_type_attr['type']](split_l[int(event_type_attr['position'])])
                 cpu_attr = self.traceAttrs['cpuId']
                 cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
                 thread_attr = self.traceAttrs['threadId']
@@ -132,22 +136,23 @@ class Trace(object):
             except ValueError:  # Occurs if any of the casts fail
                 return -1
 
-            #previous_trace_id = self.reverse_possible_trace_event_transitions.get(str(trace_id), [0])[0]
-            #previous_time = previous_times.get(str(previous_trace_id), [0]).pop()
-            previous_trace_id, previous_time = self.get_previous_event(str(trace_id), timestamp, previous_times)
+            event_type = self.trace_ids.get(trace_id).get('type', 0)
+            # The last two fields are filled in later
+            row = TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, 0, "")
+            previous_trace_id, previous_time = self.get_previous_event(row, previous_times)
 
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
 
-            #try:
-            numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
-            #except KeyError:  # Occurs if trace_id from trace is not in the config file
-            #    return -1
+            row.cur_prev_time_diff = timestamp-previous_time
+            row.previous_trace_id = previous_trace_id
 
-            self.rows.append(TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, timestamp-previous_time, previous_trace_id))
+            numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
+
+            self.rows.append(row)
 
             for _ in range(numFollowing):
-                previous_times.setdefault(str(trace_id), []).append(timestamp)
+                previous_times.append(row)
 
     @staticmethod
     def adjust_col_width(ws):
@@ -270,7 +275,7 @@ class Trace(object):
         xticks = []
         for trace_id, v in self.trace_ids.items():
             for d in v.get("traced", []):
-                e = [int(d["data"][i][4]) for i in range(len(d["data"])) if d["data"][i][6] != '1']
+                e = [int(d["data"][i][4]) for i in range(len(d["data"])) if d["data"][i][6] != '2']
                 if len(e) > 0:
                     y.append(e)
                     xticks.append(str(d["fromTraceId"])+"-"+trace_id)
