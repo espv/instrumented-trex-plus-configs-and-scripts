@@ -106,7 +106,15 @@
     },
     "10": {
       "numFollowing": 1,
-      "transitions": ["10", "12"]
+      "transitions": ["10", "12", "602"]
+    },
+    "601": {
+      "numFollowing": 1,
+      "transitions": ["602", "10"]
+    },
+    "602": {
+      "numFollowing": 1,
+      "transitions": ["601", "602", "10"]
     },
     "12": {
       "numFollowing": 1,
