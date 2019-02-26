@@ -106,7 +106,7 @@
     },
     "10": {
       "numFollowing": 1,
-      "transitions": ["10", "12", "602"]
+      "transitions": ["10", "12", "601"]
     },
     "601": {
       "numFollowing": 1,
