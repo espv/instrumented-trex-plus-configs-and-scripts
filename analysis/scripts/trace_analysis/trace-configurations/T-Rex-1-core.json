@@ -14,7 +14,15 @@
     },
     "502": {
       "numFollowing": 1,
-      "transitions": ["502", "503", "504", "505", "51"]
+      "transitions": ["502", "503", "504", "505", "51", "35"]
+    },
+    "35": {
+      "numFollowing": 1,
+      "transitions": ["502", "503", "504", "505", "51", "35", "36"]
+    },
+    "36": {
+      "numFollowing": 1,
+      "transitions": ["502", "503", "504", "505", "51", "36", "35"]
     },
     "503": {
       "numFollowing": 1,
@@ -102,7 +110,15 @@
     },
     "111": {
       "numFollowing": 1,
-      "transitions": ["10", "57"]
+      "transitions": ["112", "10"]
+    },
+    "112": {
+      "numFollowing": 1,
+      "transitions": ["10", "112", "113"]
+    },
+    "113": {
+      "numFollowing": 1,
+      "transitions": ["112", "113"]
     },
     "10": {
       "numFollowing": 1,
@@ -110,7 +126,7 @@
     },
     "601": {
       "numFollowing": 1,
-      "transitions": ["602", "10"]
+      "transitions": ["601", "602", "10"]
     },
     "602": {
       "numFollowing": 1,
@@ -129,12 +145,14 @@
     "0": {
       "id": "0",
       "csemEvents": "HIRQENTRY 0 1 [CPU_CYCLES] 1 0 0 interruptfifop_fired s\n",
-      "description": "Hardware interrupt entry event for HIRQ-1"
+      "description": "Hardware interrupt entry event for HIRQ-1",
+      "riskOfCtxSwitch": 0
     },
     "1": {
       "id": "1",
       "csemEvents": "TEMPSYNCH 0 1 [CPU_CYCLES] 1 0 1 (TEMP) readDoneLength\n",
-      "description": ""
+      "description": "",
+      "riskOfCtxSwitch": 0
     }
   },
   "traceAttributes": {
