@@ -97,8 +97,6 @@ class Trace(object):
             for prev in self.reverse_possible_trace_event_transitions.get(this_row.trace_id):
                 for i, row in enumerate(reversed(previous_rows)):
                     if row.trace_id == prev:
-                        if row.trace_id == '702' and this_row.trace_id == '230':
-                            pass
                         return row
         else:
             restart = True
