@@ -14,7 +14,15 @@
     },
     "502": {
       "numFollowing": 1,
-      "transitions": ["502", "503", "504", "505", "51"]
+      "transitions": ["502", "503", "504", "505", "51", "35"]
+    },
+    "35": {
+      "numFollowing": 1,
+      "transitions": ["502", "503", "504", "505", "51", "35", "36"]
+    },
+    "36": {
+      "numFollowing": 1,
+      "transitions": ["502", "503", "504", "505", "51", "36", "35"]
     },
     "503": {
       "numFollowing": 1,
@@ -38,11 +46,13 @@
     },
     "5": {
       "numFollowing": 1,
-      "transitions": ["6"]
+      "transitions": ["6"],
+      "type": 1
     },
     "6": {
       "numFollowing": 1,
-      "transitions": ["7"]
+      "transitions": ["7"],
+      "type": 2
     },
     "7": {
       "numFollowing": 1,
@@ -98,11 +108,21 @@
     },
     "59": {
       "numFollowing": 1,
-      "transitions": ["111"]
+      "transitions": ["111"],
+      "type": 1
     },
     "111": {
       "numFollowing": 1,
-      "transitions": ["10", "57"]
+      "transitions": ["112", "10"],
+      "type": 2
+    },
+    "112": {
+      "numFollowing": 1,
+      "transitions": ["10", "112", "113"]
+    },
+    "113": {
+      "numFollowing": 1,
+      "transitions": ["112", "113"]
     },
     "10": {
       "numFollowing": 1,
@@ -110,7 +130,7 @@
     },
     "601": {
       "numFollowing": 1,
-      "transitions": ["602", "10"]
+      "transitions": ["601", "602", "10"]
     },
     "602": {
       "numFollowing": 1,
@@ -129,12 +149,14 @@
     "0": {
       "id": "0",
       "csemEvents": "HIRQENTRY 0 1 [CPU_CYCLES] 1 0 0 interruptfifop_fired s\n",
-      "description": "Hardware interrupt entry event for HIRQ-1"
+      "description": "Hardware interrupt entry event for HIRQ-1",
+      "riskOfCtxSwitch": 0
     },
     "1": {
       "id": "1",
       "csemEvents": "TEMPSYNCH 0 1 [CPU_CYCLES] 1 0 1 (TEMP) readDoneLength\n",
-      "description": ""
+      "description": "",
+      "riskOfCtxSwitch": 0
     }
   },
   "traceAttributes": {
@@ -142,20 +164,16 @@
       "position": 0,
       "type": "integer"
     },
-    "eventType": {
+    "cpuId": {
       "position": 1,
       "type": "integer"
     },
-    "cpuId": {
+    "threadId": {
       "position": 2,
       "type": "integer"
     },
-    "threadId": {
-      "position": 3,
-      "type": "integer"
-    },
     "timestamp": {
-      "position": 4,
+      "position": 3,
       "type": "integer"
     }
   }
