@@ -102,15 +102,16 @@ class Trace(object):
             restart = True
             while restart:
                 restart = False
-                for i, row in enumerate(previous_rows):
-                    if (row.event_type == 0 or row.event_type == 2) and row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
-                        previous_row = row
-                        del previous_rows[i]
-                        return previous_row
-                    elif row.thread_id == this_row.thread_id:  # row.event_type = 1
-                        del previous_rows[i]  # We delete this because we have passed this event by now
+                for i, row in enumerate(reversed(previous_rows)):
+                    index = -(i+1)
+                    if row.thread_id == this_row.thread_id and row.event_type == 1:
+                        del previous_rows[index]  # We delete this because we have passed this event by now
                         restart = True  # Restart loop
                         break
+                    if row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
+                        previous_row = row
+                        del previous_rows[index]
+                        return previous_row
 
         return TraceEntry(timestamp=this_row.timestamp)
 
@@ -140,9 +141,6 @@ class Trace(object):
             # The last two fields are filled in later
             row = TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, 0, "")
             previous_row = self.get_previous_event(row, previous_times)
-
-            if trace_id == FIRST_trace_id or line_nr == 0:
-                previous_time = timestamp
 
             row.cur_prev_time_diff = timestamp-previous_row.timestamp
             row.previous_row = previous_row
@@ -251,7 +249,7 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[int(te.trace_id), int(te.thread_id), int(te.cpu_id), int(te.timestamp), int(te.cur_prev_time_diff), int(te.previous_row.trace_id), int(te.event_type)] for te in self.rows])
+        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_row.trace_id, te.event_type] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
         print(self.numpy_rows)
