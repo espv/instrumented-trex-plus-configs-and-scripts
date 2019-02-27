@@ -68,7 +68,7 @@ class TraceWorkBook(TemplatedWorkbook):
 
 
 class TraceEntry(object):
-    def __init__(self, line_nr, trace_id, event_type, cpu_id, thread_id, timestamp, cur_prev_time_diff, previous_trace_id):
+    def __init__(self, line_nr=0, trace_id=0, event_type=0, cpu_id=-1, thread_id=0, timestamp=0, cur_prev_time_diff=0, previous_trace_id=0):
         self.line_nr = line_nr
         self.trace_id = trace_id
         self.event_type = event_type
@@ -76,7 +76,7 @@ class TraceEntry(object):
         self.thread_id = thread_id
         self.timestamp = timestamp
         self.cur_prev_time_diff = cur_prev_time_diff
-        self.previous_trace_id = previous_trace_id
+        self.previous_row = previous_trace_id
 
 
 class Trace(object):
@@ -93,29 +93,35 @@ class Trace(object):
         self.cnt = 0
 
     def get_previous_event(self, this_row, previous_rows):
-        if len(previous_rows) == 0:
-            return "", this_row.timestamp
-
         if this_row.event_type == 2:
             for prev in self.reverse_possible_trace_event_transitions.get(this_row.trace_id):
                 for i, row in enumerate(reversed(previous_rows)):
                     if row.trace_id == prev:
-                        #index = -(i+1)
-                        #del previous_rows[index]
-                        return row.trace_id, row.timestamp
+                        if row.trace_id == '702' and this_row.trace_id == '230':
+                            pass
+                        return row
         else:
-            for i, row in enumerate(previous_rows):
-                if (row.event_type == 0 or row.event_type == 2) and row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
-                    previous_row = row
-                    del previous_rows[i]
-                    return str(previous_row.trace_id), previous_row.timestamp
+            restart = True
+            while restart:
+                restart = False
+                for i, row in enumerate(previous_rows):
+                    if (row.event_type == 0 or row.event_type == 2) and row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
+                        previous_row = row
+                        del previous_rows[i]
+                        return previous_row
+                    elif row.thread_id == this_row.thread_id:  # row.event_type = 1
+                        del previous_rows[i]  # We delete this because we have passed this event by now
+                        restart = True  # Restart loop
+                        break
 
-        return "", this_row.timestamp
+        return TraceEntry(timestamp=this_row.timestamp)
 
     def collect_data(self):
         previous_times = []
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
+            if line_nr == 46:
+                print(line_nr)
             if len(split_l) < len(self.traceAttrs):
                 return -1
 
@@ -123,10 +129,6 @@ class Trace(object):
                 # Depending on the configuration file, the trace event format might be different
                 trace_attr = self.traceAttrs['traceId']
                 trace_id = str(type_dict[trace_attr['type']](split_l[int(trace_attr['position'])]))
-                if self.trace_ids.get(trace_id) is None:
-                    continue
-                #event_type_attr = self.traceAttrs['eventType']
-                #event_type = type_dict[event_type_attr['type']](split_l[int(event_type_attr['position'])])
                 cpu_attr = self.traceAttrs['cpuId']
                 cpu_id = type_dict[cpu_attr['type']](split_l[int(cpu_attr['position'])])
                 thread_attr = self.traceAttrs['threadId']
@@ -136,18 +138,18 @@ class Trace(object):
             except ValueError:  # Occurs if any of the casts fail
                 return -1
 
-            event_type = self.trace_ids.get(trace_id).get('type', 0)
+            event_type = self.trace_ids.get(trace_id, {}).get('type', 0)
             # The last two fields are filled in later
             row = TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, 0, "")
-            previous_trace_id, previous_time = self.get_previous_event(row, previous_times)
+            previous_row = self.get_previous_event(row, previous_times)
 
             if trace_id == FIRST_trace_id or line_nr == 0:
                 previous_time = timestamp
 
-            row.cur_prev_time_diff = timestamp-previous_time
-            row.previous_trace_id = previous_trace_id
+            row.cur_prev_time_diff = timestamp-previous_row.timestamp
+            row.previous_row = previous_row
 
-            numFollowing = self.trace_ids[str(trace_id)]["numFollowing"]
+            numFollowing = self.trace_ids.get(trace_id, {"numFollowing": 1})["numFollowing"]
 
             self.rows.append(row)
 
@@ -251,16 +253,16 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
-        self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_trace_id, te.event_type] for te in self.rows])
+        self.numpy_rows = np.array([[int(te.trace_id), int(te.thread_id), int(te.cpu_id), int(te.timestamp), int(te.cur_prev_time_diff), int(te.previous_row.trace_id), int(te.event_type)] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
         print(self.numpy_rows)
         print("\n")
         # First group by => to trace ID
-        for group in npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :]):
+        for group in npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows):
             # Then group by => from trace ID
             for g2 in npi.group_by(group[:, 5]).split(group[:, :]):
-                self.trace_ids[str(group[0][0])].setdefault("traced", []).append({"fromTraceId": g2[0][5], "data": g2})
+                self.trace_ids.setdefault(str(group[0][0]), {}).setdefault("traced", []).append({"fromTraceId": g2[0][5], "data": g2})
 
         trace_file_id = re.split('traces/|[.]trace', self.trace.name)[1]
         try:
