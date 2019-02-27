@@ -119,8 +119,6 @@ class Trace(object):
         previous_times = []
         for line_nr, l in enumerate(self.trace):
             split_l = re.split('[\t\n]', l)
-            if line_nr == 46:
-                print(line_nr)
             if len(split_l) < len(self.traceAttrs):
                 return -1
 
@@ -139,10 +137,13 @@ class Trace(object):
 
             event_type = self.trace_ids.get(trace_id, {}).get('type', 0)
             # The last two fields are filled in later
-            row = TraceEntry(line_nr, trace_id, event_type, thread_id, cpu_id, timestamp, 0, "")
+            row = TraceEntry(line_nr+1, trace_id, event_type, thread_id, cpu_id, timestamp, 0, "")
             previous_row = self.get_previous_event(row, previous_times)
 
-            row.cur_prev_time_diff = timestamp-previous_row.timestamp
+            previous_time = previous_row.timestamp
+            if trace_id == FIRST_trace_id or line_nr == 0:
+                previous_time = row.timestamp
+            row.cur_prev_time_diff = timestamp-previous_time
             row.previous_row = previous_row
 
             numFollowing = self.trace_ids.get(trace_id, {"numFollowing": 1})["numFollowing"]
