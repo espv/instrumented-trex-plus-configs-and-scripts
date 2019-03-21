@@ -29,7 +29,7 @@ from openpyxl_templates.table_sheet.columns import CharColumn, IntColumn
 
 trace_fn = None
 
-FIRST_trace_id = 1
+FIRST_trace_id = '1'
 
 np.set_printoptions(edgeitems=30, linewidth=100000,
                     formatter=dict(float=lambda x: "%.3g" % x))
@@ -249,6 +249,9 @@ class Trace(object):
         self.update_bar_trigger()
 
     def as_plots(self):
+        for row in self.rows:
+            if row.trace_id == '1' and  row.previous_row.trace_id == '7':
+                print(row)
         self.numpy_rows = np.array([[te.trace_id, te.thread_id, te.cpu_id, te.timestamp, te.cur_prev_time_diff, te.previous_row.trace_id, te.event_type] for te in self.rows])
         if len(self.numpy_rows) == 0:
             return
@@ -324,15 +327,18 @@ class Trace(object):
                     if g2["fromTraceId"] == "":
                         continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
+                    #fig, ax = plt.subplots()
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
                     plt.xlabel("Processing delay (nanoseconds)")
                     plt.ylabel("Occurrences ratio")
                     group = np.array([int(r[4]) for r in g2["data"]])
-                    #sns_plot = sns.distplot(group)
-                    sns_plot = sns.distplot(group, kde=False, norm_hist=False)
-                    plt.xlim([0, np.percentile(group, 99)])
+                    ninetyninth_perc = np.percentile(group, 99)
+                    group = np.array([r for r in group if r < ninetyninth_perc])
+                    sns_plot = sns.distplot(group)
+                    #sns_plot = sns.distplot(group, kde=False, norm_hist=False)
+                    #ax.hist(group, bins=200)
                     #plt.ylim([0, 0.00001])
-                    fig = sns_plot.get_figure()
+                    #fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
                     plt.show()
                 except np.linalg.LinAlgError:
