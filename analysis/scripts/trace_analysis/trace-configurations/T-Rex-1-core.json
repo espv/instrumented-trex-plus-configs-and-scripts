@@ -42,10 +42,6 @@
     },
     "110": {
       "numFollowing": 1,
-      "transitions": ["5"]
-    },
-    "5": {
-      "numFollowing": 1,
       "transitions": ["6"],
       "type": 1
     },
@@ -101,6 +97,10 @@
     "706": {
       "numFollowing": 1,
       "transitions": ["710"]
+    },
+    "230": {
+      "numFollowing": 1,
+      "transitions": []
     },
     "710": {
       "numFollowing": 1,
