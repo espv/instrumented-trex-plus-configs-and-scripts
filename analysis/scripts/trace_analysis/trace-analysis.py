@@ -4,7 +4,6 @@ import json
 import os
 import re
 from collections import OrderedDict
-from pathlib import Path
 
 import numpy as np
 import numpy_indexed as npi
@@ -12,13 +11,14 @@ import seaborn as sns
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
 from kivy.uix.scrollview import ScrollView
-from kivy.uix.togglebutton import ToggleButton
 from matplotlib import pyplot as plt
 from openpyxl import Workbook, load_workbook
 from openpyxl.cell import Cell
@@ -90,6 +90,7 @@ class Trace(object):
         self.numpy_rows = None
         self.max = len(self.rows)+len(self.rows)*2
         self.cnt = 0
+        self.update_bar_trigger = None
 
     def get_previous_event(self, this_row, previous_rows):
         if this_row.event_type == 2:
@@ -281,11 +282,8 @@ class Trace(object):
                     y.append(e)
                     xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
-
-        #y = [[g["traced"][i][4] for i in range(len(g["traced"]))] for _, g in self.trace_ids.items()]
         fig, ax = plt.subplots(figsize=(30,5))
         x = np.arange(len(xticks))
-        #xticks = [g["traced"][0][0] for _, g in self.trace_ids.items() if len(g["traced"]) > 0 and len(g["traced"][0]) > 0]
         plt.xticks(x, xticks)
         ax.plot(x, np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
         ax.plot(x, np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
@@ -297,7 +295,6 @@ class Trace(object):
         ax.plot(x, np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
         ax.plot(x, np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
         ax.plot(x, np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
-        #ax.plot(x, np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
         plt.title("Processing delay percentiles")
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
@@ -327,7 +324,6 @@ class Trace(object):
                     if g2["fromTraceId"] == "":
                         continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
-                    #fig, ax = plt.subplots()
                     plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
                     plt.xlabel("Processing delay (nanoseconds)")
                     plt.ylabel("Occurrences ratio")
@@ -335,10 +331,6 @@ class Trace(object):
                     ninetyninth_perc = np.percentile(group, 99)
                     group = np.array([r for r in group if r < ninetyninth_perc])
                     sns_plot = sns.distplot(group)
-                    #sns_plot = sns.distplot(group, kde=False, norm_hist=False)
-                    #ax.hist(group, bins=200)
-                    #plt.ylim([0, 0.00001])
-                    #fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
                     plt.show()
                 except np.linalg.LinAlgError:
@@ -358,8 +350,7 @@ class TraceAnalysisApp(App):
         error_content = Button(text='Unknown error encountered when parsing trace. Please try a different trace.', size_hint_y=None, height=30)
         self.error_in_trace_popup = Popup(title='Error', content=error_content)
         error_content.bind(on_press=self.error_in_trace_popup.dismiss)
-        self.bl = GridLayout(cols=1, size_hint_y=None)
-        self.bl.bind(minimum_height=self.bl.setter('height'))
+        self.bl = BoxLayout()
         self.root = ScrollView(size_hint=(1, None), size=(Window.width, Window.height))
         self.root.add_widget(self.bl)
         self.possible_trace_event_transitions = {}
@@ -370,6 +361,10 @@ class TraceAnalysisApp(App):
         self.trace_file = None
         self.trace = None
         self.trace_ids = {}
+        self.fcl = self.fcl = FileChooserListView(
+            path=os.path.realpath("trace-configurations/"))  # type: FileChooserListView
+        self.fcl.bind(selection=self.selected_traceid_to_csem_events_map_file)
+        self.bl.add_widget(self.fcl)
 
     def gen_plots(self, _):
         if self.trace is not None:
@@ -384,41 +379,39 @@ class TraceAnalysisApp(App):
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
 
     def parse_trace_file(self):
-        self.bl.clear_widgets(self.bl.children)
+        self.root.clear_widgets()
+        gl = GridLayout(cols=1, size_hint_y=None)
+        gl.bind(minimum_height=gl.setter('height'))
+        self.root.add_widget(gl)
 
-        self.bl.add_widget(Label(text='Choose what to do with trace '+self.selected_trace_tb.text, size_hint_y=None, height=30))
+        gl.add_widget(Label(text='Choose what to do with trace '+self.trace_file.name, size_hint_y=None, height=30))
         gen_plots_btn = Button(text="Analyze data and generate plots", size_hint_y=None, height=30)
         gen_plots_btn.bind(on_press=self.gen_plots)
-        self.bl.add_widget(gen_plots_btn)
+        gl.add_widget(gen_plots_btn)
         gen_xlsx_btn = Button(text="Analyze data and export to excel", size_hint_y=None, height=30)
         gen_xlsx_btn.bind(on_press=self.gen_xlsx)
-        self.bl.add_widget(gen_xlsx_btn)
+        gl.add_widget(gen_xlsx_btn)
         decomp_trace_btn = Button(text="Decompress trace", size_hint_y=None, height=30)
         decomp_trace_btn.bind(on_press=self.decompress_trace)
-        self.bl.add_widget(decomp_trace_btn)
+        gl.add_widget(decomp_trace_btn)
         back_btn = Button(text="Back", size_hint_y=None, height=30)
         back_btn.bind(on_press=self.clear_and_select_trace)
-        self.bl.add_widget(back_btn)
+        gl.add_widget(back_btn)
         exit_btn = Button(text="Exit", size_hint_y=None, height=30)
         exit_btn.bind(on_press=lambda _: exit(0))
-        self.bl.add_widget(exit_btn)
+        gl.add_widget(exit_btn)
 
-        self.trace_file = open('../../traces/'+self.selected_trace_tb.text, 'r')
-        self.trace = Trace(self.trace_file, self.selected_trace_tb.text.split(".trace")[0]+".xlsx", self.trace_ids, self.reverse_possible_trace_event_transitions, self.traceAttrs)
+        self.trace = Trace(self.trace_file, self.trace_file.name.split(".trace")[0]+".xlsx", self.trace_ids, self.reverse_possible_trace_event_transitions, self.traceAttrs)
 
         if self.trace.collect_data() == -1:
-            self.bl.clear_widgets(self.bl.children)
+            self.root.clear_widgets()
             self.error_in_trace_popup.open()
             self.select_trace_to_analyze()
 
-    def select_trace_file(self, _):
-        self.selected_trace_tb = None
-        for c in self.bl.children:
-            if isinstance(c, ToggleButton) and c.state == 'down':
-                self.selected_trace_tb = c
-                break
-
+    def selected_trace_file(self, _, selection):
+        self.trace_file = open(selection[0], 'r')
         self.parse_trace_file()
+        return self.bl
 
     def eid_to_event(self, e, cycles):
         res = self.trace_id_to_CSEW_events.get(e, {}).get('csemEvents', "")
@@ -446,62 +439,28 @@ class TraceAnalysisApp(App):
         self.popup.open()
 
     def select_trace_to_analyze(self):
-        self.bl.add_widget(Label(text='Select trace file to analyze', size_hint_y=None, height=30))
-        path_list = [(os.stat('../../traces/'+p.name).st_mtime, p.name) for p in Path('../../traces').glob('**/*.trace')]
-        path_list.sort(key=lambda s: s[0])
-        for i, (time, fn) in enumerate(path_list):
-            if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down', size_hint_y=None, height=30))
-            else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace file", size_hint_y=None, height=30))
-
-        select_button = Button(text="Select", size_hint_y=None, height=30)
-        select_button.bind(on_press=self.select_trace_file)
-        exit_button = Button(text="Exit", size_hint_y=None, height=30)
-        exit_button.bind(on_press=lambda _: exit(0))
-        self.bl.add_widget(select_button)
-        self.bl.add_widget(exit_button)
-        return self.bl
+        self.fcl.path = os.path.realpath("../../traces/")
+        self.fcl.unbind(selection=self.selected_traceid_to_csem_events_map_file)
+        self.fcl.bind(selection=self.selected_trace_file)
+        return self.fcl
 
     def clear_and_select_trace(self, _):
-        self.bl.clear_widgets(self.bl.children)
-        self.select_trace_to_analyze()
+        return self.select_trace_to_analyze()
 
-    def selected_traceid_to_csem_events_map_file(self, _):
-        selected_tb = None
-        for c in self.bl.children:
-            if isinstance(c, ToggleButton) and c.state == 'down':
-                selected_tb = c
-                break
-        if selected_tb is not None:
-            trace_file = open('trace-configurations/'+selected_tb.text, 'r')
-            json_data = trace_file.read()
+    def selected_traceid_to_csem_events_map_file(self, _, selection):
+        trace_file = open(selection[0], 'r')
+        json_data = trace_file.read()
 
-            data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
-            self.trace_ids = data['traceIDs']
-            for k, v in self.trace_ids.items():
-                for a in v["transitions"]:
-                    self.reverse_possible_trace_event_transitions.setdefault(a, []).append(k) # Assume that a given trace Id can only be preceeded by one trace Id
-            self.traceAttrs = data["traceAttributes"]
+        data = json.JSONDecoder(object_pairs_hook=OrderedDict).decode(json_data)
+        self.trace_ids = data['traceIDs']
+        for k, v in self.trace_ids.items():
+            for a in v["transitions"]:
+                self.reverse_possible_trace_event_transitions.setdefault(a, []).append(k)  # Assume that a given trace Id can only be preceeded by one trace Id
+        self.traceAttrs = data["traceAttributes"]
 
         return self.clear_and_select_trace(None)
 
     def build(self):
-        self.bl.add_widget(Label(text='Choose map file from trace IDs to CSEM events', size_hint_y=None, height=30))
-        path_list = [(os.stat('trace-configurations/'+p.name).st_mtime, p.name) for p in Path('trace-configurations/').glob('**/*.json')]
-        path_list.sort(key=lambda s: s[0])
-        for i, (time, fn) in enumerate(path_list):
-            if i == 0:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", state='down', size_hint_y=None, height=30))
-            else:
-                self.bl.add_widget(ToggleButton(text=fn, group="trace ID mapping file", size_hint_y=None, height=30))
-
-        select_button = Button(text="Select", size_hint_y=None, height=30)
-        select_button.bind(on_press=self.selected_traceid_to_csem_events_map_file)
-        self.bl.add_widget(select_button)
-        exit_button = Button(text="Exit", size_hint_y=None, height=30)
-        exit_button.bind(on_press=lambda _: exit(0))
-        self.bl.add_widget(exit_button)
         return self.root
 
 
