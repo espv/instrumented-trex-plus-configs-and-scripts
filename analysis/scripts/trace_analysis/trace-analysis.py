@@ -328,7 +328,7 @@ class Trace(object):
                     plt.xlabel("Processing delay (nanoseconds)")
                     plt.ylabel("Occurrences ratio")
                     group = np.array([int(r[4]) for r in g2["data"]])
-                    ninetyninth_perc = np.percentile(group, 99)
+                    ninetyninth_perc = np.percentile(group, 90)
                     group = np.array([r for r in group if r < ninetyninth_perc])
                     sns_plot = sns.distplot(group)
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
@@ -362,7 +362,7 @@ class TraceAnalysisApp(App):
         self.trace = None
         self.trace_ids = {}
         self.fcl = self.fcl = FileChooserListView(
-            path=os.path.realpath("trace-configurations/"))  # type: FileChooserListView
+            path=os.path.realpath("trace-configurations/"), dirselect=True)  # type: FileChooserListView
         self.fcl.bind(selection=self.selected_traceid_to_csem_events_map_file)
         self.bl.add_widget(self.fcl)
 
