@@ -114,7 +114,7 @@
     "111": {
       "numFollowing": 1,
       "transitions": ["112", "10"],
-      "type": 2
+      "type": 1
     },
     "112": {
       "numFollowing": 1,

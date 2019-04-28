@@ -104,10 +104,10 @@ class Trace(object):
                 restart = False
                 for i, row in enumerate(reversed(previous_rows)):
                     index = -(i+1)
-                    if row.thread_id == this_row.thread_id and row.event_type == 1:
-                        del previous_rows[index]  # We delete this because we have passed this event by now
-                        restart = True  # Restart loop
-                        break
+                    #if row.thread_id == this_row.thread_id and row.event_type == 1:
+                    #    del previous_rows[index]  # We delete this because we have passed this event by now
+                    #    restart = True  # Restart loop
+                    #    break
                     if row.thread_id == this_row.thread_id:  # and row.cpu_id == this_row.cpu_id:
                         previous_row = row
                         del previous_rows[index]
