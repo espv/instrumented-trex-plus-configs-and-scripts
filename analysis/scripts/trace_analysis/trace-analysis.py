@@ -299,7 +299,7 @@ class Trace(object):
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
         fig.savefig('output/'+trace_file_id+'/percentiles.png')
-        plt.show()
+        #plt.show()
         plt.cla()
 
         flattened_y = np.hstack(np.asarray([np.asarray(e) for e in y]).flatten())
@@ -308,20 +308,20 @@ class Trace(object):
             for _ in e:
                 x.append(i)
 
-        plt.title("Processing delay scatter plot")
-        plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay (nanoseconds)")
-        plt.figure(figsize=(30, 5))
-        fig = plt.scatter(x, flattened_y).get_figure()
+        #plt.title("Processing delay scatter plot")
+        #plt.xlabel("Processing stage")
+        #plt.ylabel("Processing delay (nanoseconds)")
+        #plt.figure(figsize=(30, 5))
+        #fig = plt.scatter(x, flattened_y).get_figure()
 
-        plt.xticks(range(len(xticks)), xticks)
-        fig.savefig('output/'+trace_file_id+'/scatter.png')
-        plt.show()
+        #plt.xticks(range(len(xticks)), xticks)
+        #fig.savefig('output/'+trace_file_id+'/scatter.png')
+        #plt.show()
 
         for toTraceId, v in self.trace_ids.items():
             for g2 in v.get("traced", []):
                 try:
-                    if g2["fromTraceId"] == "":
+                    if g2["fromTraceId"] == "" or g2["fromTraceId"] == "0":
                         continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
                     plt.title("Processing delay histogram for processing stage " + proc_stage)
