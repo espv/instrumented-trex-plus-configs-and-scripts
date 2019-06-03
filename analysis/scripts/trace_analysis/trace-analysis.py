@@ -282,7 +282,7 @@ class Trace(object):
                     y.append(e)
                     xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
-        fig, ax = plt.subplots(figsize=(30,5))
+        fig, ax = plt.subplots()#figsize=(30,5))
         x = np.arange(len(xticks))
         plt.xticks(x, xticks)
         ax.plot(x, np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
@@ -385,6 +385,10 @@ class TraceAnalysisApp(App):
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
 
+    def restart(self, _):
+        self.stop()
+        TraceAnalysisApp().run()
+
     def parse_trace_file(self):
         self.root.clear_widgets()
         gl = GridLayout(cols=1, size_hint_y=None)
@@ -402,7 +406,7 @@ class TraceAnalysisApp(App):
         decomp_trace_btn.bind(on_press=self.decompress_trace)
         gl.add_widget(decomp_trace_btn)
         back_btn = Button(text="Back", size_hint_y=None, height=30)
-        back_btn.bind(on_press=self.clear_and_select_trace)
+        back_btn.bind(on_press=self.restart)
         gl.add_widget(back_btn)
         exit_btn = Button(text="Exit", size_hint_y=None, height=30)
         exit_btn.bind(on_press=lambda _: exit(0))
@@ -452,6 +456,8 @@ class TraceAnalysisApp(App):
         return self.fcl
 
     def clear_and_select_trace(self, _):
+        self.root.clear_widgets()
+        self.root.add_widget(self.bl)
         return self.select_trace_to_analyze()
 
     def selected_traceid_to_csem_events_map_file(self, _, selection):
