@@ -282,7 +282,7 @@ class Trace(object):
                     y.append(e)
                     xticks.append(str(d["fromTraceId"])+"-"+trace_id)
 
-        fig, ax = plt.subplots(figsize=(30,5))
+        fig, ax = plt.subplots()#figsize=(30,5))
         x = np.arange(len(xticks))
         plt.xticks(x, xticks)
         ax.plot(x, np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
@@ -299,7 +299,7 @@ class Trace(object):
         plt.xlabel("Processing stage")
         plt.ylabel("Processing delay (nanoseconds)")
         fig.savefig('output/'+trace_file_id+'/percentiles.png')
-        plt.show()
+        #plt.show()
         plt.cla()
 
         flattened_y = np.hstack(np.asarray([np.asarray(e) for e in y]).flatten())
@@ -308,31 +308,38 @@ class Trace(object):
             for _ in e:
                 x.append(i)
 
-        plt.title("Processing delay scatter plot")
-        plt.xlabel("Processing stage")
-        plt.ylabel("Processing delay (nanoseconds)")
-        plt.figure(figsize=(30, 5))
-        fig = plt.scatter(x, flattened_y).get_figure()
+        #plt.title("Processing delay scatter plot")
+        #plt.xlabel("Processing stage")
+        #plt.ylabel("Processing delay (nanoseconds)")
+        #plt.figure(figsize=(30, 5))
+        #fig = plt.scatter(x, flattened_y).get_figure()
 
-        plt.xticks(range(len(xticks)), xticks)
-        fig.savefig('output/'+trace_file_id+'/scatter.png')
-        plt.show()
+        #plt.xticks(range(len(xticks)), xticks)
+        #fig.savefig('output/'+trace_file_id+'/scatter.png')
+        #plt.show()
 
         for toTraceId, v in self.trace_ids.items():
             for g2 in v.get("traced", []):
                 try:
-                    if g2["fromTraceId"] == "":
+                    if g2["fromTraceId"] == "" or g2["fromTraceId"] == "0":
                         continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
-                    plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
-                    plt.xlabel("Processing delay (nanoseconds)")
-                    plt.ylabel("Occurrences ratio")
-                    group = np.array([int(r[4]) for r in g2["data"]])
-                    ninetyninth_perc = np.percentile(group, 90)
+                    plt.title("Processing delay histogram for processing stage " + proc_stage)
+                    plt.xlabel("Processing delay (µs)")
+                    plt.ylabel("Number of events")
+                    group = np.array([int(r[4])/1000 for r in g2["data"]])
+                    ninetyninth_perc = np.percentile(group, 99)
                     group = np.array([r for r in group if r < ninetyninth_perc])
-                    sns_plot = sns.distplot(group)
+                    sns_plot = sns.distplot(group, bins=20, kde=False)
+                    #sns_plot.xaxis.set_major_locator(ticker.MultipleLocator(10))
+                    fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
+
                     plt.show()
+                    #plt.title('sequence of events and their processing delays')
+                    #plt.ylabel('Processing delay (nanoseconds)')
+                    #plt.plot(group, linestyle="None", marker="x")
+                    #plt.show()
                 except np.linalg.LinAlgError:
                     pass
 
@@ -378,6 +385,10 @@ class TraceAnalysisApp(App):
             self.bl.add_widget(pb, 3)
             self.trace.regular_as_xlsx(pb, self.popup, self.bl, btn)
 
+    def restart(self, _):
+        self.stop()
+        TraceAnalysisApp().run()
+
     def parse_trace_file(self):
         self.root.clear_widgets()
         gl = GridLayout(cols=1, size_hint_y=None)
@@ -395,7 +406,7 @@ class TraceAnalysisApp(App):
         decomp_trace_btn.bind(on_press=self.decompress_trace)
         gl.add_widget(decomp_trace_btn)
         back_btn = Button(text="Back", size_hint_y=None, height=30)
-        back_btn.bind(on_press=self.clear_and_select_trace)
+        back_btn.bind(on_press=self.restart)
         gl.add_widget(back_btn)
         exit_btn = Button(text="Exit", size_hint_y=None, height=30)
         exit_btn.bind(on_press=lambda _: exit(0))
@@ -445,6 +456,8 @@ class TraceAnalysisApp(App):
         return self.fcl
 
     def clear_and_select_trace(self, _):
+        self.root.clear_widgets()
+        self.root.add_widget(self.bl)
         return self.select_trace_to_analyze()
 
     def selected_traceid_to_csem_events_map_file(self, _, selection):
