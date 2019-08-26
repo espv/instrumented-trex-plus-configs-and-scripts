@@ -324,15 +324,22 @@ class Trace(object):
                     if g2["fromTraceId"] == "":
                         continue
                     proc_stage = g2["fromTraceId"] + "-" + toTraceId
-                    plt.title("Normalized processing delay histogram for processing stage " + proc_stage)
-                    plt.xlabel("Processing delay (nanoseconds)")
-                    plt.ylabel("Occurrences ratio")
-                    group = np.array([int(r[4]) for r in g2["data"]])
-                    ninetyninth_perc = np.percentile(group, 90)
+                    plt.title("Processing delay histogram for processing stage " + proc_stage)
+                    plt.xlabel("Processing delay (µs)")
+                    plt.ylabel("Number of events")
+                    group = np.array([int(r[4])/1000 for r in g2["data"]])
+                    ninetyninth_perc = np.percentile(group, 99)
                     group = np.array([r for r in group if r < ninetyninth_perc])
-                    sns_plot = sns.distplot(group)
+                    sns_plot = sns.distplot(group, bins=20, kde=False)
+                    #sns_plot.xaxis.set_major_locator(ticker.MultipleLocator(10))
+                    fig = sns_plot.get_figure()
                     fig.savefig('output/'+trace_file_id+'/processing-stage-'+proc_stage+'.png')
+
                     plt.show()
+                    #plt.title('sequence of events and their processing delays')
+                    #plt.ylabel('Processing delay (nanoseconds)')
+                    #plt.plot(group, linestyle="None", marker="x")
+                    #plt.show()
                 except np.linalg.LinAlgError:
                     pass
 
